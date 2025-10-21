@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:53:58 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/20 15:41:42 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/10/20 16:14:25 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int main(int ac, char **av, char **envp)
 			exit (0);
 		if (line[0] != '\0')	// Check for empty input to not clog history with empty lines
 			add_history(line);
-		parse();
+		parse(line);
 		// execute
 		// free
 	}

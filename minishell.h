@@ -47,19 +47,14 @@ typedef enum e_toktype
     TOKEN_REDIR_OUT,   // >
     TOKEN_APPEND,      // >>
     TOKEN_HEREDOC,     // <<
-    TOKEN_AND,         // &&
-    TOKEN_OR,          // ||
-    TOKEN_SEMICOLON,   // ;
-    TOKEN_LPAREN,      // (
-    TOKEN_RPAREN,      // )
     TOKEN_EOF          // end of input
 }   t_toktype;
 
 typedef struct s_token
 {
     t_toktype       type;
-    char            value;
-    struct s_tokennext;
+    char            *value;
+    struct s_token  *next;
     struct s_token  *prev;
 }   t_token;
 
