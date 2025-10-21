@@ -58,4 +58,8 @@ typedef struct s_token
     struct s_token  *prev;
 }   t_token;
 
+void	print_list(t_token *tokens);
+void	build_token_list(t_token **tokens, char **arr);
+char	**split(char *line);
+
 #endif

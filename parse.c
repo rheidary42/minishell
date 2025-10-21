@@ -14,7 +14,12 @@
 
 t_token	*tokenize(char *line)
 {
-	char **arr = split(line);
+	t_token	*tokens;
+	char **arr;
+
+	arr = split(line);
+	build_token_list(&tokens, arr);
+	print_list(tokens);
 	assign_values();
 }
 

@@ -25,9 +25,11 @@ int	is_delim(char *str)
 
 int	token_len(char *str)
 {
-	int	len = 0;
-	int	d = is_delim(str);
+	int	len;
+	int	d;
 
+	d = is_delim(str);
+	len = 0;
 	if (d)
 		return (d);
 	while (str[len] && is_delim(&str[len]) == 0)
@@ -76,10 +78,12 @@ char	**split(char *line)
 {
 	char	**arr;
 	int		tokens;
-	int		i = 0;
-	int		j = 0;
+	int		i;
+	int		j;
 	int		len;
 
+	i = 0;
+	j = 0;
 	tokens = count_tokens(line);
 	arr = malloc(sizeof(char *) * (tokens + 1));
 	if (!arr)
@@ -100,14 +104,14 @@ char	**split(char *line)
 	return (arr);
 }
 
-int	main(void)
-{
-	char	**str = split("<< echo hello | wc -l >>> << outfile >>");
+// int	main(void)
+// {
+// 	char	**str = split("<< echo hello | wc -l >>> << outfile >>");
 
-	for (int i = 0; str[i]; i++)
-		printf("[%s]\n", str[i]);
-	for (int i = 0; str[i]; i++)
-		free(str[i]);
-	free(str);
-	return (0);
-}
+// 	for (int i = 0; str[i]; i++)
+// 		printf("[%s]\n", str[i]);
+// 	for (int i = 0; str[i]; i++)
+// 		free(str[i]);
+// 	free(str);
+// 	return (0);
+// }
