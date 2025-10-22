@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 13:16:17 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/22 13:25:29 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/10/22 13:41:45 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 // echo > < file
 //
 // Only EOF or empty input:
-// (just enter key)
+// should be handled by main
 
 int	is_redir(t_token *tok)
 {
@@ -45,5 +45,24 @@ int	is_pipe(t_token *token)
 
 int	validate_tokens(t_token *tokens)
 {
+	t_token	*curr;
+
+	curr = tokens;
+	if (is_pipe(curr))
+		return (0);
+	while (curr)
+	{
+		if (is_pipe(curr))
+		{
+			if (!curr->next || is_pipe(curr->next))
+				return (0);
+		}
+		else if (is_redir(curr))
+		{
+			if (!curr->next || curr->next->type != TOKEN_WORD)
+				return (0);
+		}
+		curr = curr->next;
+	}
 	return (1);
 }
