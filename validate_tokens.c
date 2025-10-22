@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 13:16:17 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/22 13:41:45 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:39:03 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,14 +52,14 @@ int	validate_tokens(t_token *tokens)
 		return (0);
 	while (curr)
 	{
-		if (is_pipe(curr))
+		if (is_pipe(curr) != 0)
 		{
-			if (!curr->next || is_pipe(curr->next))
+			if (curr->next == NULL || is_pipe(curr->next) != 0)
 				return (0);
 		}
-		else if (is_redir(curr))
+		else if (is_redir(curr) != 0)
 		{
-			if (!curr->next || curr->next->type != TOKEN_WORD)
+			if (curr->next == NULL || curr->next->type != TOKEN_WORD)
 				return (0);
 		}
 		curr = curr->next;
