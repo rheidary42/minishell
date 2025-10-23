@@ -12,90 +12,134 @@
 
 #include "minishell.h"
 
-int	count_argc(t_token **tokens)
+int	count_argc(t_token *tokens)
 {
-	t_token	*curr;
-	int		count;
+	int	count;
 
 	count = 0;
-	curr = *tokens;
-	while (curr->type != TOKEN_PIPE)
+	while (tokens != NULL && tokens->type != TOKEN_PIPE)
 	{
-		curr = curr->next;
-		count++;
+		if (tokens->type == TOKEN_WORD)
+			count++;
+		tokens = tokens->next;
 	}
 	return (count);
 }
 
-t_cmd	*new_cmd_node(t_cmd **cmds, t_token **tokens)
+t_cmd	*create_append(t_shell **shell, t_token *curr_token)
 {
 	t_cmd	*new;
 	t_cmd	*curr;
 
-	curr = *cmds;
 	new = ft_calloc(1, sizeof(t_cmd));
 	if (new == NULL)
 		return (NULL);
-	new->argv = malloc(sizeof(char *) * (count_argc(tokens) + 1));
+	new->argv = ft_calloc((count_argc(curr_token) + 1), sizeof(char *));
 	if (new->argv == NULL)
-		return (NULL);
-	if (*cmds == NULL)
 	{
-		*cmds = new;
+		//FREE NEW NOW OR DO LATER?
+		return (NULL);
+	}
+	if ((*shell)->cmds == NULL)
+	{
+		(*shell)->cmds = new;
 		return (new);
 	}
+	curr = (*shell)->cmds;
 	while (curr->next != NULL)
 		curr = curr->next;
 	curr->next = new;
-	return(curr->next);
+	return(new);
 }
 
-void	build_commands(t_cmd **cmds, t_token **tokens)
+bool	is_redir(t_token *token)
 {
-	t_token	*token_curr;
-	t_cmd	*cmd_curr;
+	if (token->type == TOKEN_REDIR_IN || token->type == TOKEN_REDIR_OUT
+			|| token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC)
+	{
+		return (true);
+	}
+	return (false);
+}
+
+bool	is_argv(t_token *token)
+{
+	if (token->prev == NULL || is_redir(token->prev) == false)
+		return (true);
+	return (false);
+}
+
+void	append_redir(t_cmd *cmd, t_token *token)
+{
+	t_redir	*redirection;
+	t_redir	*curr;
+
+	redirection = ft_calloc(1, sizeof(t_redir));
+	if (redirection == NULL)
+		return ; // TO DO ERROR
+	redirection->type = token->type;
+	redirection->file = ft_strdup(token->next->value);
+	redirection->prev = NULL;
+	redirection->next = NULL;
+	if (cmd->redir == NULL)
+	{
+		cmd->redir = redirection;
+		return ;
+	}
+	curr = cmd->redir;
+	while (curr->next != NULL)
+		curr = curr->next;
+	curr->next = redirection;
+	redirection->prev = curr;
+}
+
+void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr)
+{
+	t_token	*curr_token;
+
+	curr_token = *curr_token_ptr;
+	if (curr_token->next != NULL && curr_token->next->type == TOKEN_WORD)
+		{
+			append_redir(curr_cmd, curr_token);
+			*curr_token_ptr = curr_token->next;
+		}
+		else
+		{
+			/*""MAYBE"" SYNTAX ERROR HANDLING HERE BECAUSE
+			REDIRECTION DETECTED WITHOUT FILENAME AFTER OR KEEP IT WITH VALIDATE TOKEN*/
+		}
+}
+
+void	build_commands(t_shell **shell)
+{
+	t_token	*curr;
+	t_cmd	*cmd;
 	int		i;
 
 	i = 0;
-	token_curr = *tokens;
-	cmd_curr = *cmds;
-	while (token_curr->next != NULL)
+	curr = (*shell)->tokens;
+	cmd = NULL;
+	while (curr != NULL)
 	{
-		// build_argv(cmds, tokens);
-		// build_redir();
-		if (cmd_curr == NULL || token_curr->type == TOKEN_PIPE)
+		if (cmd == NULL)
 		{
-			cmd_curr = new_cmd_node(cmds, tokens);
-			if (cmd_curr == NULL)
-				return ; //to do error handling
+			cmd = create_append(shell, curr);
+			if (cmd == NULL)
+				return ; // ERROR HANDLING TO DO
 			i = 0;
-			token_curr = token_curr->next;
 		}
-		if (token_curr->type == TOKEN_HEREDOC)
+		if (is_redir(curr) == true)
+			handle_redir(cmd, &curr);
+		else if (curr->type == TOKEN_WORD && is_argv(curr) == true)
+			cmd->argv[i++] = curr->value;
+		else if (curr->type == TOKEN_PIPE)
 		{
-			cmd_curr->redir->type = TOKEN_HEREDOC;
-			cmd_curr->redir->file = token_curr->next->value;
-			token_curr = token_curr->next->next;
+			if (cmd != NULL)
+				cmd->argv[i] = NULL;
+			cmd = NULL;
 		}
-		else if (token_curr->type == TOKEN_REDIR_OUT
-				&& token_curr->next->type == TOKEN_WORD)
-		{
-			cmd_curr->redir->type = TOKEN_REDIR_OUT;
-			cmd_curr->redir->file = token_curr->next->value;
-			token_curr = token_curr->next->next;
-		}
-		else if (token_curr->type == TOKEN_REDIR_IN
-				&& token_curr->prev->type == TOKEN_WORD)
-		{
-			cmd_curr->redir->type = TOKEN_REDIR_IN;
-			cmd_curr->redir->file = token_curr->prev->value;
-			token_curr = token_curr->next;
-		}
-		else if (token_curr->type == TOKEN_WORD)
-		{
-			cmd_curr->argv[i] = token_curr->value;
-			token_curr = token_curr->next;
-			i++;
-		}
+		curr = curr->next;
 	}
+	if (cmd != NULL)
+		cmd->argv[i] = NULL; // FOR THE LAST COMMANDS ARGV ARRAY
 }

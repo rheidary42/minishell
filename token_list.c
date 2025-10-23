@@ -125,18 +125,54 @@ void	print_cmds(t_token **tokens, t_cmd **cmds)
 	}
 }
 
+// int	main(void)
+// {
+// 	t_token *tokens;
+// 	t_cmd	*cmds;
+// 	char	**arr;
+
+// 	tokens = NULL;
+// 	cmds = NULL;
+// 	arr = split("<< echo hello | wc -l >>> << outfile >>");
+// 	build_token_list(&tokens, arr);
+// 	//print_list(tokens);
+// 	//free_list(&tokens);
+// 	build_commands(&cmds, &tokens);
+// 	print_cmds(&tokens, &cmds);
+// }
+
 int	main(void)
 {
-	t_token *tokens;
-	t_cmd	*cmds;
-	char	**arr;
+	t_shell	*shell;
+	t_cmd	*curr;
+	t_token	*curr_token;
+	shell = ft_calloc(1, sizeof(t_shell));
+	shell->line = ft_strdup("< Makefile cat | wc -l > output.txt");
+	parse(&shell);
+	curr = shell->cmds;
+	curr_token = shell->tokens;
+	while (curr_token != NULL)
+	{
+		printf("%s\n", curr_token->value);
+		curr_token = curr_token->next;
+	}
 
-	tokens = NULL;
-	cmds = NULL;
-	arr = split("<< echo hello | wc -l >>> << outfile >>");
-	build_token_list(&tokens, arr);
-	//print_list(tokens);
-	//free_list(&tokens);
-	build_commands(&cmds, &tokens);
-	print_cmds(&tokens, &cmds);
+	printf("\n\nseperation\n\n");
+
+	while (curr != NULL)
+	{
+		for (int j = 0; curr->argv[j] != NULL; j++)
+		{
+			printf("ARGV=%s ; ", curr->argv[j]);
+		}
+		t_redir	*r = curr->redir;
+		while (r != NULL)
+		{
+			printf("REDIR=%s ; ", r->file);
+			r = r->next;
+		}
+		curr = curr->next;
+		printf("\nnext command\n");
+	}
+
 }

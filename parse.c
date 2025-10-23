@@ -12,26 +12,26 @@
 
 #include "minishell.h"
 
-t_token	*tokenize(t_shell *shell)
+t_token	*tokenize(t_shell **shell)
 {
 	char **arr;
 
-	arr = split(shell);
-	build_token_list(&shell->tokens, arr);
+	arr = split(*shell);
+	build_token_list(&((*shell)->tokens), arr);
 	// clean arguments
-	if (!validate_tokens(shell->tokens))
-	{
-		//cleanup
-		exit(1);
-	}
-	build_cmds(&shell);
-	print_list(tokens);
-	assign_values();
+	// if (!validate_tokens((*shell)->tokens))
+	// {
+	// 	//cleanup
+	// 	exit(1);
+	// }
+	build_commands(shell);
+	//assign_values();
+	return (NULL);
 }
 
-void	parse(t_shell *shell)
+void	parse(t_shell **shell)
 {
 	tokenize(shell);
-	commandize();
-	expand();
+	// commandize();
+	// expand();
 }

@@ -19,7 +19,7 @@ int main(int ac, char **av, char **envp)
 
 	(void)ac; (void)av; (void)envp;
 	shell = ft_calloc(1, sizeof(t_shell));
-	if (!shell == NULL)
+	if (shell == NULL)
 		return (1);
 	while (true)
 	{
@@ -28,7 +28,7 @@ int main(int ac, char **av, char **envp)
 			exit (0);
 		if (line[0] != '\0')	// Check for empty input to not clog history with empty lines
 			add_history(line);
-		parse(shell);
+		parse(&shell);
 		// execute
 		// free
 	}
