@@ -111,14 +111,32 @@ void	build_token_list(t_token **tokens, char **arr)
 	append_node(tokens, new_node("EOF"));
 }
 //TEST TOKENIZER
+void	print_cmds(t_token **tokens, t_cmd **cmds)
+{
+	t_cmd *curr;
+	curr = *cmds;
+	for (int i = 0; curr->next != NULL; i++)
+	{
+		for (int j = 0; curr->argv[j] != NULL; j++)
+		{
+			printf("%s ; ", curr->argv[j]);
+		}
+		printf("%i; %s", curr->redir->type, curr->redir->file);
+	}
+}
+
 int	main(void)
 {
 	t_token *tokens;
+	t_cmd	*cmds;
 	char	**arr;
 
 	tokens = NULL;
+	cmds = NULL;
 	arr = split("<< echo hello | wc -l >>> << outfile >>");
 	build_token_list(&tokens, arr);
-	print_list(tokens);
-	free_list(&tokens);
+	//print_list(tokens);
+	//free_list(&tokens);
+	build_commands(&cmds, &tokens);
+	print_cmds(&tokens, &cmds);
 }

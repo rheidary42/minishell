@@ -26,7 +26,7 @@ t_token	*tokenize(char *line)
 		//cleanup
 		exit(1);
 	}
-	build_cmd(&cmd, tokens);
+	build_cmds(&cmd, &tokens);
 	print_list(tokens);
 	assign_values();
 }

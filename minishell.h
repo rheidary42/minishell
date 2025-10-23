@@ -60,20 +60,22 @@ typedef struct s_token
 
 typedef struct s_redir
 {
-	int	type;
-	char	*file;
+	t_toktype   type;
+	char	    *file;
 }	t_redir;
 
 typedef struct s_cmd
 {
 	char	**argv;
 	t_redir	*redir;
-	char	*redir_out;
+    char    *redir_output; // for execution later
 	int		redir_count;
+    struct  s_cmd   *next;
 }	t_cmd;
 
 void	print_list(t_token *tokens);
 void	build_token_list(t_token **tokens, char **arr);
 char	**split(char *line);
+void	build_commands(t_cmd **cmds, t_token **tokens);
 
 #endif
