@@ -6,34 +6,32 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 12:23:09 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/22 14:11:36 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/10/23 12:39:40 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token	*tokenize(char *line)
+t_token	*tokenize(t_shell *shell)
 {
-	t_token	*tokens;
-	t_cmd	*cmd;
 	char **arr;
 
-	arr = split(line);
-	build_token_list(&tokens, arr);
+	arr = split(shell);
+	build_token_list(&shell->tokens, arr);
 	// clean arguments
-	if (!validate_tokens(tokens))
+	if (!validate_tokens(shell->tokens))
 	{
 		//cleanup
 		exit(1);
 	}
-	build_cmds(&cmd, &tokens);
+	build_cmds(&shell);
 	print_list(tokens);
 	assign_values();
 }
 
-void	parse(char *line)
+void	parse(t_shell *shell)
 {
-	tokenize(line);
+	tokenize(shell);
 	commandize();
 	expand();
 }

@@ -73,6 +73,12 @@ typedef struct s_cmd
     struct  s_cmd   *next;
 }	t_cmd;
 
+typedef struct s_shell
+{
+    t_cmd   *cmds;    t_token *tokens;
+    char    *line;
+}   t_shell;
+
 void	print_list(t_token *tokens);
 void	build_token_list(t_token **tokens, char **arr);
 char	**split(char *line);

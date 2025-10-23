@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 16:43:26 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/20 19:10:30 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/10/23 12:34:33 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 	return (i);
 }
 
-char	**split(char *line)
+char	**split(t_shell *shell)
 {
 	char	**arr;
 	int		tokens;
@@ -84,19 +84,19 @@ char	**split(char *line)
 
 	i = 0;
 	j = 0;
-	tokens = count_tokens(line);
+	tokens = count_tokens(shell->line);
 	arr = malloc(sizeof(char *) * (tokens + 1));
 	if (!arr)
 		return (NULL);
 	while (i < tokens)
 	{
-		while (line[j] == ' ')
+		while (shell->line[j] == ' ')
 			j++;
-		len = token_len(&line[j]);
+		len = token_len(&shell->line[j]);
 		arr[i] = malloc(len + 1);
 		if (!arr[i])
 			return (NULL);
-		ft_strlcpy(arr[i], &line[j], len + 1);
+		ft_strlcpy(arr[i], &shell->line[j], len + 1);
 		j += len;
 		i++;
 	}
