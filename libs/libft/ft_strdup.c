@@ -26,14 +26,12 @@ static char	*ft_strcpy(char *dest, char *src)
 	return (dest);
 }
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup(const char *s, t_shell *shell)
 {
 	char	*dup_str;
 	char	*s_cast;
 
-	dup_str = malloc(ft_strlen(s) + 1);
-	if (!dup_str)
-		return (NULL);
+	dup_str = safe_calloc((ft_strlen(s) + 1), shell);
 	s_cast = (char *)s;
 	dup_str = ft_strcpy(dup_str, s_cast);
 	return (dup_str);

@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-void	*safe_malloc(size_t size, t_shell *shell)
+void	*safe_calloc(size_t size, t_shell *shell)
 {
 	void	*ptr;
 
-	ptr = malloc(size);
+	ptr = ft_calloc(1, size);
 	if (!ptr)
 	{
 		clean_up(shell);

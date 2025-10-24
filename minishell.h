@@ -90,4 +90,7 @@ void	parse(t_shell **shell);
 t_token	*tokenize(t_shell **shell);
 void	build_commands(t_shell **shell);
 
+        //ALLOCATION
+void	*safe_calloc(size_t size, t_shell *shell);
+
 #endif

@@ -10,6 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/* FOR CREATE_APPEND, safe calloc at end because, incase of argv failure, 
+safe_calloc can only free "new". if its part of shell->cmds
+same in append_redir, for redirection->file and
+also refactored ft_strdup to use safe_calloc as well*/
+
 #include "minishell.h"
 
 int	count_argc(t_token *tokens)
@@ -31,15 +36,7 @@ t_cmd	*create_append(t_shell **shell, t_token *curr_token)
 	t_cmd	*new;
 	t_cmd	*curr;
 
-	new = ft_calloc(1, sizeof(t_cmd));
-	if (new == NULL)
-		return (NULL);
-	new->argv = ft_calloc((count_argc(curr_token) + 1), sizeof(char *));
-	if (new->argv == NULL)
-	{
-		//FREE NEW NOW OR DO LATER?
-		return (NULL);
-	}
+	new = safe_calloc(sizeof(t_cmd), *shell);
 	if ((*shell)->cmds == NULL)
 	{
 		(*shell)->cmds = new;
@@ -49,7 +46,9 @@ t_cmd	*create_append(t_shell **shell, t_token *curr_token)
 	while (curr->next != NULL)
 		curr = curr->next;
 	curr->next = new;
-	return(new);
+	new->argv = safe_calloc((count_argc(curr_token) + 1)
+				* sizeof(char *), *shell);
+	return (new);
 }
 
 bool	is_redir(t_token *token)
@@ -69,16 +68,15 @@ bool	is_argv(t_token *token)
 	return (false);
 }
 
-void	append_redir(t_cmd *cmd, t_token *token)
+void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 {
 	t_redir	*redirection;
 	t_redir	*curr;
 
-	redirection = ft_calloc(1, sizeof(t_redir));
+	redirection = safe_calloc(sizeof(t_redir), shell);
 	if (redirection == NULL)
 		return ; // TO DO ERROR
 	redirection->type = token->type;
-	redirection->file = ft_strdup(token->next->value);
 	redirection->prev = NULL;
 	redirection->next = NULL;
 	if (cmd->redir == NULL)
@@ -91,22 +89,17 @@ void	append_redir(t_cmd *cmd, t_token *token)
 		curr = curr->next;
 	curr->next = redirection;
 	redirection->prev = curr;
+	redirection->file = ft_strdup(token->next->value, shell);
 }
-
-void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr)
+void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell)
 {
 	t_token	*curr_token;
 
 	curr_token = *curr_token_ptr;
 	if (curr_token->next != NULL && curr_token->next->type == TOKEN_WORD)
 		{
-			append_redir(curr_cmd, curr_token);
+			append_redir(curr_cmd, curr_token, shell);
 			*curr_token_ptr = curr_token->next;
-		}
-		else
-		{
-			/*""MAYBE"" SYNTAX ERROR HANDLING HERE BECAUSE
-			REDIRECTION DETECTED WITHOUT FILENAME AFTER OR KEEP IT WITH VALIDATE TOKEN*/
 		}
 }
 
@@ -124,12 +117,10 @@ void	build_commands(t_shell **shell)
 		if (cmd == NULL)
 		{
 			cmd = create_append(shell, curr);
-			if (cmd == NULL)
-				return ; // ERROR HANDLING TO DO
 			i = 0;
 		}
 		if (is_redir(curr) == true)
-			handle_redir(cmd, &curr);
+			handle_redir(cmd, &curr, *shell);
 		else if (curr->type == TOKEN_WORD && is_argv(curr) == true)
 			cmd->argv[i++] = curr->value;
 		else if (curr->type == TOKEN_PIPE)
