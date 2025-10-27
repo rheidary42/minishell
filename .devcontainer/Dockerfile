@@ -1,9 +1,9 @@
-# Lightweight Debian base, amd64
-FROM --platform=linux/amd64 debian:bullseye-slim
+# Ubuntu 22.04 (bash 5.1.16)
+FROM --platform=linux/amd64 ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install only what's necessary
+# Install required packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	build-essential \
 	git \
