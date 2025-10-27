@@ -69,11 +69,19 @@ typedef struct s_redir
 typedef struct s_cmd
 {
 	char	**argv;
+    t_env   *env;
 	t_redir	*redir;
     char    *redir_output; // for execution later
 	int		redir_count;
     struct  s_cmd   *next;
 }	t_cmd;
+
+typedef struct  s_env
+{
+    char    *name;
+    char    *value;
+    struct s_env   *next;
+}   t_env;
 
 typedef struct s_shell
 {

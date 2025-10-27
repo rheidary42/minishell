@@ -40,6 +40,8 @@ t_cmd	*create_append(t_shell **shell, t_token *curr_token)
 	if ((*shell)->cmds == NULL)
 	{
 		(*shell)->cmds = new;
+		new->argv = safe_calloc((count_argc(curr_token) + 1)
+				* sizeof(char *), *shell);
 		return (new);
 	}
 	curr = (*shell)->cmds;
@@ -82,6 +84,7 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 	if (cmd->redir == NULL)
 	{
 		cmd->redir = redirection;
+		redirection->file = ft_strdup(token->next->value, shell);
 		return ;
 	}
 	curr = cmd->redir;
