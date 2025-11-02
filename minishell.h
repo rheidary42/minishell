@@ -62,6 +62,7 @@ typedef struct s_redir
 {
 	t_toktype       type;
 	char            *file;
+    int             heredoc_fd;
     struct s_redir  *next;
     struct s_redir  *prev;
 }	t_redir;
@@ -85,9 +86,25 @@ typedef struct  s_env
 
 typedef struct s_shell
 {
-    t_cmd   *cmds;    t_token *tokens;
+    t_cmd   *cmds;
+    t_token *tokens;
+    t_env   *env;
     char    *line;
+    int     last_exit_status;
 }   t_shell;
+
+typedef struct  s_exec
+{
+    char    **all_paths;
+    char    *paths_from_env;
+    char    *final_path;
+    int     pipe_fds[2];
+    int     prev_fd;
+    int     file_fd;
+    pid_t   child;
+    pid_t   last_child;
+}   t_exec;
+
 
 void	print_list(t_token *tokens);
 void	build_token_list(t_token **tokens, char **arr);
@@ -100,5 +117,21 @@ void	build_commands(t_shell **shell);
 
         //ALLOCATION
 void	*safe_calloc(size_t size, t_shell *shell);
+
+        //EXECUTION HELPEERS
+char	*custom_strjoin(char const *s1, char const *s2, t_shell *shell);
+bool	is_direct_path(char *executable);
+void	initialise_exec(t_exec *exec);
+int     count_path(char *paths_from_env);
+char	*get_paths_from_env(t_env *env);
+char	**split_paths(char *paths_from_env, t_shell *shell);
+void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec);
+char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell);
+void	path_lookup(char *cmd_name, t_shell *shell, t_exec *exec);
+void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);
+        //EXECUTION
+int	exec_ext_cmd(t_cmd *cmd, t_shell *shell, t_exec *exec);
+int	exec_single_cmd(t_shell *shell, t_exec *exec);
+int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 
 #endif
