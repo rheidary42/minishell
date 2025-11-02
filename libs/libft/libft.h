@@ -6,16 +6,16 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 21:02:47 by rheidary          #+#    #+#             */
-/*   Updated: 2025/05/19 13:54:35 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/02 16:33:00 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
 
-# include "minishell.h"
 # include <stdlib.h>
 # include <unistd.h>
+
 
 typedef struct s_list
 {
@@ -45,7 +45,7 @@ int				ft_memcmp(const void *s1, const void *s2, size_t n);
 char			*ft_strnstr(const char *big, const char *little, size_t len);
 int				ft_atoi(const char *nptr);
 void			*ft_calloc(size_t nmemb, size_t size);
-char			*ft_strdup(const char *s, t_shell *shell);
+char			*ft_strdup(const char *s);
 char			*ft_substr(char const *s, unsigned int start, size_t len);
 char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strtrim(char const *s1, char const *set);

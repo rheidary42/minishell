@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 21:05:00 by rheidary          #+#    #+#             */
-/*   Updated: 2025/05/26 13:54:46 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/02 16:33:54 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ static char	*ft_strcpy(char *dest, char *src)
 	return (dest);
 }
 
-char	*ft_strdup(const char *s, t_shell *shell)
+char	*ft_strdup(const char *s)
 {
 	char	*dup_str;
 	char	*s_cast;
 
-	dup_str = safe_calloc((ft_strlen(s) + 1), shell);
+	dup_str = ft_calloc(1, (ft_strlen(s) + 1));
 	s_cast = (char *)s;
 	dup_str = ft_strcpy(dup_str, s_cast);
 	return (dup_str);
