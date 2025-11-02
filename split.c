@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 16:43:26 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/02 15:13:08 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/02 20:13:10 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,12 @@ int	token_len(char *str)
 
 int	count_tokens(char *str)
 {
-	int	i = 0;
-	int	count = 0;
+	int	i;
+	int	count;
 	int	len;
 
+	i = 0;
+	count = 0;
 	while (str[i])
 	{
 		while (str[i] == ' ')
@@ -109,11 +111,11 @@ char	**split(t_shell *shell)
 	{
 		while (shell->line[j] == ' ')
 			j++;
-		len = token_len(&shell->line[j]);
+		len = token_len(&(shell->line[j]));
 		arr[i] = malloc(len + 1);
 		if (!arr[i])
 			return (NULL);
-		strlcpy(arr[i], &shell->line[j], len + 1);
+		ft_strlcpy(arr[i], &(shell->line[j]), len + 1);
 		j += len;
 		i++;
 	}

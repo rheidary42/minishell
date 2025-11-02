@@ -67,6 +67,13 @@ typedef struct s_redir
     struct s_redir  *prev;
 }	t_redir;
 
+typedef struct  s_env
+{
+    char    *name;
+    char    *value;
+    struct s_env   *next;
+}   t_env;
+
 typedef struct s_cmd
 {
 	char	**argv;
@@ -76,13 +83,6 @@ typedef struct s_cmd
 	int		redir_count;
     struct  s_cmd   *next;
 }	t_cmd;
-
-typedef struct  s_env
-{
-    char    *name;
-    char    *value;
-    struct s_env   *next;
-}   t_env;
 
 typedef struct s_shell
 {
@@ -106,17 +106,22 @@ typedef struct  s_exec
 }   t_exec;
 
 
-void	print_list(t_token *tokens);
-void	build_token_list(t_token **tokens, char **arr);
+void	print_list(t_shell *shell);
+void	build_token_list(t_shell *shell, char **arr);
 char	**split(t_shell *shell);
-void	build_commands(t_shell **shell);
 
-void	parse(t_shell **shell);
-t_token	*tokenize(t_shell **shell);
-void	build_commands(t_shell **shell);
+void	parse(t_shell *shell);
+t_token	*tokenize(t_shell *shell);
+int	    token_len(char *str);
+void	build_commands(t_shell *shell);
 
         //ALLOCATION
 void	*safe_calloc(size_t size, t_shell *shell);
+void	clean_up(t_shell *shell);
+
+        //HELPERS
+char	*ft_safe_strdup(const char *s, t_shell *shell);
+char	*ft_strcpy(char *dest, char *src);
 
         //EXECUTION HELPEERS
 char	*custom_strjoin(char const *s1, char const *s2, t_shell *shell);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   build_cmd.c                                        :+:      :+:    :+:   */
+/*   build_commands.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:10:30 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/22 14:22:35 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/02 20:14:33 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,25 +31,25 @@ int	count_argc(t_token *tokens)
 	return (count);
 }
 
-t_cmd	*create_append(t_shell **shell, t_token *curr_token)
+t_cmd	*create_append(t_shell *shell, t_token *curr_token)
 {
 	t_cmd	*new;
 	t_cmd	*curr;
 
-	new = safe_calloc(sizeof(t_cmd), *shell);
-	if ((*shell)->cmds == NULL)
+	new = safe_calloc(sizeof(t_cmd), shell);
+	if (shell->cmds == NULL)
 	{
-		(*shell)->cmds = new;
+		shell->cmds = new;
 		new->argv = safe_calloc((count_argc(curr_token) + 1)
-				* sizeof(char *), *shell);
+				* sizeof(char *), shell);
 		return (new);
 	}
-	curr = (*shell)->cmds;
+	curr = shell->cmds;
 	while (curr->next != NULL)
 		curr = curr->next;
 	curr->next = new;
 	new->argv = safe_calloc((count_argc(curr_token) + 1)
-				* sizeof(char *), *shell);
+				* sizeof(char *), shell);
 	return (new);
 }
 
@@ -84,7 +84,7 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 	if (cmd->redir == NULL)
 	{
 		cmd->redir = redirection;
-		redirection->file = ft_strdup(token->next->value, shell);
+		redirection->file = ft_safe_strdup(token->next->value, shell);
 		return ;
 	}
 	curr = cmd->redir;
@@ -92,7 +92,7 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 		curr = curr->next;
 	curr->next = redirection;
 	redirection->prev = curr;
-	redirection->file = ft_strdup(token->next->value, shell);
+	redirection->file = ft_safe_strdup(token->next->value, shell);
 }
 
 void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell)
@@ -107,14 +107,14 @@ void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell)
 		}
 }
 
-void	build_commands(t_shell **shell)
+void	build_commands(t_shell *shell)
 {
 	t_token	*curr;
 	t_cmd	*cmd;
 	int		i;
 
 	i = 0;
-	curr = (*shell)->tokens;
+	curr = shell->tokens;
 	cmd = NULL;
 	while (curr != NULL)
 	{
@@ -124,7 +124,7 @@ void	build_commands(t_shell **shell)
 			i = 0;
 		}
 		if (is_redir(curr) == true)
-			handle_redir(cmd, &curr, *shell);
+			handle_redir(cmd, &curr, shell);
 		else if (curr->type == TOKEN_WORD && is_argv(curr) == true)
 			cmd->argv[i++] = curr->value;
 		else if (curr->type == TOKEN_PIPE)

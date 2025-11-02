@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:53:58 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/23 12:30:41 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/02 16:07:29 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int main(int ac, char **av, char **envp)
 		shell->line = readline("minishell>");
 		if (shell->line == NULL)	// If EOF (CTRL-D) detected exit
 			exit (0);
-		parse(&shell);
+		parse(shell);
 		if (line[0] != '\0')	// Check for empty input to not clog history with empty lines
 			add_history(line);
 		// execute

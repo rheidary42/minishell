@@ -1,13 +1,15 @@
 #include "minishell.h"
 
-void	print_list(t_token *tokens)
+void	print_list(t_shell *shell)
 {
-	while (tokens != NULL)
+	t_token *curr = shell->tokens;
+
+	while (curr != NULL)
 	{
-		printf("%s ; ", tokens -> value);
-		printf("%i ; ", tokens -> type);
-		printf("%p\n", tokens -> prev);
-		tokens = tokens -> next;
+		printf("%s ; ", curr -> value);
+		printf("%i ; ", curr -> type);
+		printf("%p\n", curr -> prev);
+		curr = curr->next;
 	}
 }
 
@@ -24,40 +26,40 @@ void	free_split_arr(char **arr)
 	free(arr);
 }
 
-void	free_list(t_token **head)
+void	free_list(t_shell *shell)
 {
 	t_token	*curr;
 	t_token	*onebehind;
 
-	if (head == NULL)
-		return ;
-	curr = *head;
+	// if (head == NULL)
+	// 	return ;
+	curr = shell->tokens;
 	while (curr != NULL)
 	{
 		onebehind = curr;
-		curr = curr -> next;
-		free(onebehind -> value);
+		curr = curr->next;
+		free(onebehind->value);
 		free(onebehind);
 	}
-	*head = NULL;
+	shell->tokens = NULL;
 }
 
-void	append_node(t_token **tokens, t_token *new)
+void	append_node(t_shell *shell, t_token *new)
 {
 	t_token	*curr;
 
-	if (tokens == NULL || new == NULL)
+	if (new == NULL)
 		return ;
-	curr = *tokens;
-	if (*tokens == NULL)
+	if (shell->tokens == NULL)
 	{
-		*tokens = new;
+		shell->tokens = new;
 		return ;
 	}
-	while (curr -> next != NULL)
-		curr = curr -> next;
-	curr -> next = new;
-	new -> prev = curr;
+	curr = shell->tokens;
+	while (curr->next != NULL)
+		curr = curr->next;
+	curr->next = new;
+	new->prev = curr;
 }
 
 t_toktype	token_type(char *str)
@@ -77,7 +79,7 @@ t_toktype	token_type(char *str)
 	return (TOKEN_WORD);
 }
 
-t_token	*new_node(char *str)
+t_token	*new_node(char *str, t_shell *shell)
 {
 	t_token	*new;
 
@@ -85,30 +87,30 @@ t_token	*new_node(char *str)
 	if (new == NULL)
 		return (NULL);
 	new -> type = token_type(str);
-	new -> value = ft_strdup(str);
+	new -> value = ft_safe_strdup(str, shell);
 	new -> prev = NULL;
 	new -> next = NULL;
 	return (new);
 }
 
-void	build_token_list(t_token **tokens, char **arr)
+void	build_token_list(t_shell *shell, char **arr)
 {
 	t_token	*new;
 	int		i;
 
 	i = 0;
-	if (tokens == NULL || arr == NULL)
-		return ;
+	// if (shell == NULL || arr == NULL)
+	// 	return ;	exit and clean?
 	while (arr[i] != NULL)
 	{
-		new = new_node(arr[i]);
+		new = new_node(arr[i], shell);
 		if (new == NULL)
-			return (free_list(tokens));
-		append_node(tokens, new);
+			return (free_list(shell));
+		append_node(shell, new);
 		i++;
 	}
 	free_split_arr(arr);
-	append_node(tokens, new_node("EOF"));
+	append_node(shell, new_node("EOF", shell));
 }
 //TEST TOKENIZER
 void	print_cmds(t_token **tokens, t_cmd **cmds)
@@ -136,7 +138,7 @@ void	print_cmds(t_token **tokens, t_cmd **cmds)
 // 	arr = split("<< echo hello | wc -l >>> << outfile >>");
 // 	build_token_list(&tokens, arr);
 // 	//print_list(tokens);
-// 	//free_list(&tokens);
+//	free_list(shell);
 // 	build_commands(&cmds, &tokens);
 // 	print_cmds(&tokens, &cmds);
 // }
@@ -146,10 +148,13 @@ int	main(void)
 	t_shell	*shell;
 	t_cmd	*curr;
 	t_token	*curr_token;
+
 	shell = ft_calloc(1, sizeof(t_shell));
-	shell->line = ft_strdup("< Makefile cat | wc -l > output.txt");
-	parse(&shell);
+
+	shell->line = ft_safe_strdup("< Makefile cat \"This is not a test\"| wc -l > output.txt", shell);
+	parse(shell);
 	curr = shell->cmds;
+
 	curr_token = shell->tokens;
 	while (curr_token != NULL)
 	{
@@ -157,14 +162,13 @@ int	main(void)
 		curr_token = curr_token->next;
 	}
 
-	printf("\n\nseperation\n\n");
+	printf("\n--- Commands ---\n");
 
 	while (curr != NULL)
 	{
 		for (int j = 0; curr->argv[j] != NULL; j++)
-		{
 			printf("ARGV=%s ; ", curr->argv[j]);
-		}
+		
 		t_redir	*r = curr->redir;
 		while (r != NULL)
 		{
@@ -174,5 +178,7 @@ int	main(void)
 		curr = curr->next;
 		printf("\nnext command\n");
 	}
-
+	free_list(shell);
+	free(shell->line);
+	free(shell);
 }
