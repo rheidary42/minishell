@@ -6,13 +6,25 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 16:43:26 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/23 12:34:33 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:13:08 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include <stdlib.h>
 #include <stdio.h>
+
+void	handle_quote(char *str, int *len)
+{
+	char	delim;
+
+	delim = str[*len];
+	(*len)++;
+	while (str[*len] && str[*len] != delim)
+		(*len)++;
+	if (str[*len] == delim)
+		(*len)++;
+}
 
 int	is_delim(char *str)
 {
@@ -33,7 +45,12 @@ int	token_len(char *str)
 	if (d)
 		return (d);
 	while (str[len] && is_delim(&str[len]) == 0)
-		len++;
+	{
+		if (str[len] == '"' || str[len] == '\'')
+			handle_quote(str, &len);
+		else
+			len++;
+	}
 	return (len);
 }
 
@@ -96,7 +113,7 @@ char	**split(t_shell *shell)
 		arr[i] = malloc(len + 1);
 		if (!arr[i])
 			return (NULL);
-		ft_strlcpy(arr[i], &shell->line[j], len + 1);
+		strlcpy(arr[i], &shell->line[j], len + 1);
 		j += len;
 		i++;
 	}
@@ -106,7 +123,7 @@ char	**split(t_shell *shell)
 
 // int	main(void)
 // {
-// 	char	**str = split("<< echo hello | wc -l >>> << outfile >>");
+// 	char	**str = split("<< echo \" I am one token hello\" | wc -l >> << outfile >>");
 
 // 	for (int i = 0; str[i]; i++)
 // 		printf("[%s]\n", str[i]);
