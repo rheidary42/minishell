@@ -32,6 +32,11 @@ t_token	*tokenize(t_shell **shell)
 void	parse(t_shell **shell)
 {
 	tokenize(shell);
+	while (state == in_quote)
+	{
+		readline()
+		append;
+	}
 	// commandize();
 	// expand();
 }

@@ -94,6 +94,7 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 	redirection->prev = curr;
 	redirection->file = ft_strdup(token->next->value, shell);
 }
+
 void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell)
 {
 	t_token	*curr_token;
