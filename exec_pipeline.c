@@ -72,4 +72,5 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 		exec->last_child = exec->child;
 	}
 	wait_for_children(shell, exec);
+	return (shell->last_exit_status);
 }
