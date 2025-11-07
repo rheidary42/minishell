@@ -32,6 +32,8 @@ void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 
 void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
+	char	**envp;
+
 	apply_redir(shell, cmd, cmd->redir, exec);
 	if (is_direct_path(cmd->argv[0]) == true)
 		exec->final_path = cmd->argv[0];
@@ -43,6 +45,7 @@ void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		printf("%s: command not found\n", cmd->argv[0]);
 		exit(127);
 	}
+	envp = convert_envp(shell);
 	execve(exec->final_path, cmd->argv, shell->env);
 	perror(cmd->argv[0]);
 	exit(127);
@@ -66,7 +69,7 @@ int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	waitpid(exec->child, &status, 0);
 	if (WIFEXITED(status) != 0)
 		shell->last_exit_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status) == 0)
+	else if (WIFSIGNALED(status) != 0)
 		shell->last_exit_status = 128 + WTERMSIG(status);
 	return (shell->last_exit_status);
 }
@@ -85,5 +88,5 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 	{
 		return (exec_builtin(cmd));
 	}
-	return (exec_ext_cmd(cmd, shell, exec));
+	return (exec_ext_cmd(shell, cmd, exec));
 }
