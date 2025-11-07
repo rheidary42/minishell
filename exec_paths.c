@@ -7,7 +7,7 @@ char	*get_paths_from_env(t_env *env)
 	curr = env;
 	while (curr != NULL)
 	{
-		if (ft_strncmp(curr->name, "PATH=", 5) == 0)
+		if (ft_strncmp(curr->name, "PATH", 4) == 0)
 			return (curr->value);
 		curr = curr->next;
 	}
@@ -39,6 +39,8 @@ char	**split_paths(char *paths_from_env, t_shell *shell)
 
 	end = 0;
 	start = 0;
+	if (paths_from_env == NULL)
+		return (NULL);
 	path_count = count_path(paths_from_env);
 	all_paths = safe_calloc(sizeof(char *) * (path_count + 1), shell);
 	path_count = 0;
@@ -48,11 +50,18 @@ char	**split_paths(char *paths_from_env, t_shell *shell)
 		{
 			all_paths[path_count] = ft_substr(paths_from_env, start, end - start);
 			if (all_paths[path_count] == NULL)
-				return (free_func(all_paths, shell), NULL);
+				return (free_func(all_paths), NULL);
 			path_count++;
 			start = end + 1;
 		}
 		end++;
+	}
+	if (end - start > 0)
+	{
+		all_paths[path_count] = ft_substr(paths_from_env, start, end);
+		if (all_paths[path_count] == NULL)
+			return (free_func(all_paths), NULL);
+		path_count++;
 	}
 	all_paths[path_count] = NULL;
 	return (all_paths);
@@ -68,9 +77,7 @@ char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell)
 		return (NULL);
 	while (all_paths[i] != NULL)
 	{
-		temp = custom_strjoin(all_paths[i], cmd_name, shell);
-		if (temp == NULL)
-			return (NULL);
+		temp = str_join3(all_paths[i], "/", cmd_name, shell);
 		if (access(temp, X_OK) == 0)
 			return (temp);
 		i++;
