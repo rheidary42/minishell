@@ -39,6 +39,8 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+extern volatile sig_atomic_t	g_sig;
+
 typedef enum e_toktype
 {
     TOKEN_WORD,        // command or argument
