@@ -14,7 +14,7 @@ void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 		else if (r->type == TOKEN_REDIR_IN)
 			exec->file_fd = open(r->file, O_RDONLY);
 		else if (r->type == TOKEN_HEREDOC)
-			exec->file_fd = handle_heredoc(r->file);
+			exec->file_fd = handle_heredoc(shell, r->file);
 		if (exec->file_fd == -1)
 		{
 			free_and_close(shell, cmd, exec);
@@ -23,7 +23,7 @@ void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 		}
 		if (r->type == TOKEN_REDIR_IN || r->type == TOKEN_HEREDOC)
 			dup2(exec->file_fd, STDIN_FILENO);
-		if (r->type == TOKEN_REDIR_OUT || r->type == TOKEN_APPEND)
+		else if (r->type == TOKEN_REDIR_OUT || r->type == TOKEN_APPEND)
 			dup2(exec->file_fd, STDOUT_FILENO);
 		close(exec->file_fd);
 		r = r->next;
