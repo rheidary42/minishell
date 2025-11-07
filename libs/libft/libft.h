@@ -57,6 +57,7 @@ void			ft_putchar_fd(char c, int fd);
 void			ft_putstr_fd(char *s, int fd);
 void			ft_putendl_fd(char *s, int fd);
 void			ft_putnbr_fd(int n, int fd);
+int				ft_strcmp(const char *s1, const char *s2);
 
 t_list			*ft_lstnew_bonus(void *content);
 void			ft_lstadd_front_bonus(t_list **lst, t_list *new);
