@@ -60,29 +60,30 @@ bool	is_direct_path(char *executable)
 	return (false);
 }
 
-char	*custom_strjoin(char const *s1, char const *s2, t_shell *shell)
+char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell)
 {
 	char	*str_comb;
 	int		a;
 	int		b;
+	int		c;
 
-	str_comb = safe_calloc((ft_strlen(s1) + ft_strlen(s2) + 2), shell);
-	if (!str_comb)
-		return (NULL);
+	str_comb = safe_calloc((ft_strlen(s1) + ft_strlen(s2)
+				+ ft_strlen(s3) + 1), shell);
 	a = 0;
 	b = 0;
+	c = 0;
 	while (s1[a] != '\0')
 	{
 		str_comb[a] = s1[a];
 		a++;
 	}
-	str_comb[a++] = '/';
 	while (s2[b] != '\0')
 	{
-		str_comb[a] = s2[b];
-		a++;
+		str_comb[a + b] = s2[b];
 		b++;
 	}
-	str_comb[a] = '\0';
+	while (s3[c] != '\0')
+		str_comb[a + b + c] = s3[c++];
+	str_comb[a + b + c] = '\0';
 	return (str_comb);
 }
