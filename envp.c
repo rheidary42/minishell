@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:03:06 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/03 17:04:01 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/12 16:25:04 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,14 @@ int	copy_var(t_env *env, char *str)
 	size_t	value_len;
 
 	name_len = strlen_delim(str, '=');
+	if (str[name_len] == '\0')		//no "=" found, 
+	{
+		env->name = ft_strdup(str);
+		env->value = ft_strdup("");
+		if (!env->name || !env->value)
+			return (0);
+		return (1);
+	}
 	value_len = strlen_delim(str + name_len + 1, '\0');
 	env->name = ft_calloc(1, name_len + 1);
 	if (env->name == NULL)
@@ -66,6 +74,8 @@ int	make_envp(t_env *copy_env, char **curr_env)
 	int		i;
 
 	i = 0;
+	if (!curr_env || !curr_env[0])
+		return (EXIT_FAILURE);
 	curr_node = copy_env;
 	while (curr_env[i] != NULL)
 	{
