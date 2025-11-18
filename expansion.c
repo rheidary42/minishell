@@ -6,15 +6,52 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/18 17:59:49 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/18 21:42:00 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+size_t	exit_status_len(int i)
+{
+	if (i < 10)
+		return (1);
+	if (i < 100)
+		return (2);
+	return (3);
+}
+
+int	ft_is_space(char c)
+{
+	return ()
+}
+
 size_t	get_var_len(char *value, int *i, t_shell *shell)
 {
-	
+	char	*key;
+	int		start;
+	t_env	*head;
+	size_t	len;
+
+	len = 0;
+	start = *i;
+	if (value[*i] == '?')
+		return (*i += 1, exit_status_len(shell->last_exit_status));
+	while (value[start] && (ft_isalnum(value[start])) != 0)
+		start++;
+	key = ft_substr(value, *i, start - (*i + 1));
+	head = shell->env;
+	while (head != NULL)
+	{
+		if (ft_strcmp(head->name, key) == 0)
+		{
+			len = ft_strlen(head->value);
+			break ;
+		}
+		head = head->next;
+	}
+	*i = start;
+	return (free(key), len);
 }
 
 size_t	calc_expanded_size(char *value, t_shell *shell)
@@ -35,11 +72,10 @@ size_t	calc_expanded_size(char *value, t_shell *shell)
 				i++;
 			}
 			i++;
-			continue ;
 		}
-		else if (value[i] == '$')
+		else if (value[i] == '$' && ++i)
 			len += get_var_len(value, &i, shell);
-		else
+		else if (++i)
 			len++;
 	}
 	return (len);
@@ -63,6 +99,7 @@ int	needs_expansions(t_token *token)
 			if (token->value[i] == '\0')
 				return (EXIT_FAILURE);
 		}
+		// Add '_' potentially, ask around and look in manual
 		if ((token->value[i] == '$' && ft_isalpha(token->value[i + 1]))
 			|| (token->value[i] == '$' && token->value[i + 1] == '?'))
 			return (EXIT_SUCCESS);
