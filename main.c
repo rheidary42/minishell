@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:53:58 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/03 17:03:40 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/12 16:13:40 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int main(int ac, char **av, char **envp)
 {
 	t_shell	*shell;
 
-	(void)ac; (void)av; (void)envp;
+	(void)ac; (void)av;
 	shell = ft_calloc(1, sizeof(t_shell));
 	if (shell == NULL)
 		return (EXIT_FAILURE);

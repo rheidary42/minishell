@@ -1,41 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse.c                                            :+:      :+:    :+:   */
+/*   param_helper.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/20 12:23:09 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/18 15:20:28 by rheidary         ###   ########.fr       */
+/*   Created: 2025/11/12 17:03:25 by rheidary          #+#    #+#             */
+/*   Updated: 2025/11/25 05:21:52 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token	*tokenize(t_shell *shell)
+size_t	exit_status_len(int i)
 {
-	char	**arr;
-
-	arr = split(shell);
-	build_token_list(shell, arr);
-	// clean arguments
-	if (!validate_tokens(shell->tokens))
-	{
-		//cleanup
-		exit(1);
-	}
-	return (NULL);
+	if (i < 10)
+		return (1);
+	if (i < 100)
+		return (2);
+	return (3);
 }
 
-void	parse(t_shell *shell)
+int	ifs(char c)
 {
-	tokenize(shell);
-	build_commands(shell);
-	// while (state == in_quote)
-	// {
-	// 	readline()
-	// 	append;
-	// }
-	// commandize();
-	// expand();
+	if (c == ' ' || c == '\t' || c == '\n')
+		return (EXIT_SUCCESS);
+	return (EXIT_FAILURE);
 }

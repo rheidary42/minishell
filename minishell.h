@@ -56,6 +56,9 @@ typedef struct s_token
 {
     t_toktype       type;
     char            *value;
+	char			*expanded;
+	bool			*dq_mask;
+	bool			is_expanded;
     struct s_token  *next;
     struct s_token  *prev;
 }   t_token;
@@ -143,5 +146,12 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	make_envp(t_env *copy_env, char **curr_env);
 char	**convert_envp(t_shell *shell);
 int	free_env_list(t_env *head);
+
+
+
+// EXPANSIONS // WILL FORMAT EVENTUALLY
+size_t	exit_status_len(int i);
+int		ifs(char c);
+void	copy_char_expansion(size_t *i, char *dest, char c);
 
 #endif
