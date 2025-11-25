@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:57:48 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/23 12:17:48 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/25 06:13:05 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	*safe_calloc(size_t size, t_shell *shell)
 {
 	void	*ptr;
 
+	if (size == 0)
+		return (NULL);
 	ptr = ft_calloc(1, size);
 	if (!ptr)
 	{
