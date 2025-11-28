@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/25 11:41:23 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/11/28 16:53:06 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,89 +245,92 @@ void	parameter(t_shell *shell)
 // 	quote(shell);
 // }
 
-/* Helper to create a new environment variable */
-t_env *new_env(const char *name, const char *value)
-{
-    t_env *env = malloc(sizeof(t_env));
-    if (!env)
-        return NULL;
-    env->name = strdup(name);
-    env->value = strdup(value);
-    env->next = NULL;
-    return env;
-}
 
-/* Helper to add env to shell */
-void add_env(t_shell *shell, t_env *env)
-{
-    if (!shell->env)
-        shell->env = env;
-    else
-    {
-        t_env *tmp = shell->env;
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = env;
-    }
-}
+// === TESTER ===
 
-/* Helper to create a new token */
-t_token *new_token(const char *value)
-{
-    t_token *token = malloc(sizeof(t_token));
-    if (!token)
-        return NULL;
-    token->value = strdup(value);
-    token->expanded = NULL;
-    token->dq_mask = NULL;
-    token->is_expanded = false;
-    token->type = TOKEN_WORD;
-    token->next = NULL;
-    token->prev = NULL;
-    return token;
-}
+// /* Helper to create a new environment variable */
+// t_env *new_env(const char *name, const char *value)
+// {
+//     t_env *env = malloc(sizeof(t_env));
+//     if (!env)
+//         return NULL;
+//     env->name = strdup(name);
+//     env->value = strdup(value);
+//     env->next = NULL;
+//     return env;
+// }
 
-/* Print expanded token values */
-void print_tokens(t_shell *shell)
-{
-    t_token *curr = shell->tokens;
-    while (curr)
-    {
-        printf("Original: [%s]\n", curr->value);
-        printf("Expanded: [%s]\n", curr->expanded ? curr->expanded : "(null)");
-        printf("Double-quote mask: ");
-        if (curr->dq_mask)
-        {
-            for (size_t i = 0; i < strlen(curr->expanded); i++)
-                printf("%d", curr->dq_mask[i]);
-        }
-        printf("\n\n");
-        curr = curr->next;
-    }
-}
+// /* Helper to add env to shell */
+// void add_env(t_shell *shell, t_env *env)
+// {
+//     if (!shell->env)
+//         shell->env = env;
+//     else
+//     {
+//         t_env *tmp = shell->env;
+//         while (tmp->next)
+//             tmp = tmp->next;
+//         tmp->next = env;
+//     }
+// }
 
-int main(void)
-{
-    t_shell shell;
-    memset(&shell, 0, sizeof(shell));
+// /* Helper to create a new token */
+// t_token *new_token(const char *value)
+// {
+//     t_token *token = malloc(sizeof(t_token));
+//     if (!token)
+//         return NULL;
+//     token->value = strdup(value);
+//     token->expanded = NULL;
+//     token->dq_mask = NULL;
+//     token->is_expanded = false;
+//     token->type = TOKEN_WORD;
+//     token->next = NULL;
+//     token->prev = NULL;
+//     return token;
+// }
 
-    /* Setup environment */
-    add_env(&shell, new_env("USER", "alice"));
-    add_env(&shell, new_env("HOME", "/home/alice"));
-    add_env(&shell, new_env("SHELL", "/bin/bash"));
+// /* Print expanded token values */
+// void print_tokens(t_shell *shell)
+// {
+//     t_token *curr = shell->tokens;
+//     while (curr)
+//     {
+//         printf("Original: [%s]\n", curr->value);
+//         printf("Expanded: [%s]\n", curr->expanded ? curr->expanded : "(null)");
+//         printf("Double-quote mask: ");
+//         if (curr->dq_mask)
+//         {
+//             for (size_t i = 0; i < strlen(curr->expanded); i++)
+//                 printf("%d", curr->dq_mask[i]);
+//         }
+//         printf("\n\n");
+//         curr = curr->next;
+//     }
+// }
 
-    shell.last_exit_status = 42;
+// int main(void)
+// {
+//     t_shell shell;
+//     memset(&shell, 0, sizeof(shell));
 
-    /* Setup tokens */
-    shell.tokens = new_token("Hello $USER!");
-    shell.tokens->next = new_token("Your home is $HOME.");
-	shell.tokens->next = new_token("\"User: $USER\"");
+//     /* Setup environment */
+//     add_env(&shell, new_env("USER", "alice"));
+//     add_env(&shell, new_env("HOME", "/home/alice"));
+//     add_env(&shell, new_env("SHELL", "/bin/bash"));
 
-    /* Run expansion */
-    parameter(&shell);
+//     shell.last_exit_status = 42;
 
-    /* Print results */
-    print_tokens(&shell);
+//     /* Setup tokens */
+//     shell.tokens = new_token("Hello $USER!");
+//     shell.tokens->next = new_token("Your home is $HOME.");
+// 	shell.tokens->next = new_token("\"User: $USER\"");
 
-    return 0;
-}
+//     /* Run expansion */
+//     parameter(&shell);
+
+//     /* Print results */
+//     print_tokens(&shell);
+
+//     return 0;
+// }
