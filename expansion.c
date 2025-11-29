@@ -14,7 +14,7 @@
 
 size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 {
-	char	*key;
+	char	*var_name;
 	int		var_end;
 	t_env	*head;
 	size_t	len;
@@ -25,11 +25,11 @@ size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 		return (*var_start += 1, exit_status_len(shell->last_exit_status));
 	while (value[var_end] && (ft_isalnum(value[var_end])) != 0)
 		var_end++;
-	key = ft_substr(value, *var_start, var_end - *var_start);
+	var_name = ft_substr(value, *var_start, var_end - *var_start);
 	head = shell->env;
 	while (head != NULL)
 	{
-		if (ft_strcmp(head->name, key) == 0)
+		if (ft_strcmp(head->name, var_name) == 0)
 		{
 			len = ft_strlen(head->value);
 			break ;
@@ -37,7 +37,7 @@ size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 		head = head->next;
 	}
 	*var_start = var_end;
-	return (free(key), len);
+	return (free(var_name), len);
 }
 
 size_t	calc_expanded_size(char *value, t_shell *shell)
@@ -73,6 +73,7 @@ int	needs_expansions(t_token *token)
 	i = 0;
 	while (token->value[i])
 	{
+		//test'hi'
 		if (token->value[i] == '\'')
 		{
 			i++;
@@ -180,6 +181,8 @@ void	copy_char_original(size_t *i, int *in_quote, t_token *token)
 
 //	i[0] = tracking value
 //	i[1] = tracking expanded value
+//	in_quote = 1 -> double quotes
+//	in_quote = 2 -> single quotes
 //	A little unhinged but if i don't understand it in a week
 //	and you don't understand it ever and the evaluator doesn't
 //	even know what hes looking at, then we can't fail because
@@ -191,6 +194,7 @@ void	expand_value(t_token *token, t_shell *shell, size_t len)
 
 	token->expanded = safe_calloc(len + 1, shell);
 	token->dq_mask = safe_calloc(len, shell);
+	// "$var"hi'$var'
 	in_quote = 0;
 	i[0] = 0;
 	i[1] = 0;
@@ -248,49 +252,49 @@ void	parameter(t_shell *shell)
 
 // === TESTER ===
 
-// /* Helper to create a new environment variable */
-// t_env *new_env(const char *name, const char *value)
-// {
-//     t_env *env = malloc(sizeof(t_env));
-//     if (!env)
-//         return NULL;
-//     env->name = strdup(name);
-//     env->value = strdup(value);
-//     env->next = NULL;
-//     return env;
-// }
+/* Helper to create a new environment variable */
+t_env *new_env(const char *name, const char *value)
+{
+    t_env *env = malloc(sizeof(t_env));
+    if (!env)
+        return NULL;
+    env->name = strdup(name);
+    env->value = strdup(value);
+    env->next = NULL;
+    return env;
+}
 
-// /* Helper to add env to shell */
-// void add_env(t_shell *shell, t_env *env)
-// {
-//     if (!shell->env)
-//         shell->env = env;
-//     else
-//     {
-//         t_env *tmp = shell->env;
-//         while (tmp->next)
-//             tmp = tmp->next;
-//         tmp->next = env;
-//     }
-// }
+/* Helper to add env to shell */
+void add_env(t_shell *shell, t_env *env)
+{
+    if (!shell->env)
+        shell->env = env;
+    else
+    {
+        t_env *tmp = shell->env;
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = env;
+    }
+}
 
-// /* Helper to create a new token */
-// t_token *new_token(const char *value)
-// {
-//     t_token *token = malloc(sizeof(t_token));
-//     if (!token)
-//         return NULL;
-//     token->value = strdup(value);
-//     token->expanded = NULL;
-//     token->dq_mask = NULL;
-//     token->is_expanded = false;
-//     token->type = TOKEN_WORD;
-//     token->next = NULL;
-//     token->prev = NULL;
-//     return token;
-// }
+/* Helper to create a new token */
+t_token *new_token(const char *value)
+{
+    t_token *token = malloc(sizeof(t_token));
+    if (!token)
+        return NULL;
+    token->value = strdup(value);
+    token->expanded = NULL;
+    token->dq_mask = NULL;
+    token->is_expanded = false;
+    token->type = TOKEN_WORD;
+    token->next = NULL;
+    token->prev = NULL;
+    return token;
+}
 
-// /* Print expanded token values */
+/* Print expanded token values */
 // void print_tokens(t_shell *shell)
 // {
 //     t_token *curr = shell->tokens;

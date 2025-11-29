@@ -46,7 +46,7 @@ void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		exit(127);
 	}
 	envp = convert_envp(shell);
-	execve(exec->final_path, cmd->argv, shell->env);
+	execve(exec->final_path, cmd->argv, envp);
 	perror(cmd->argv[0]);
 	exit(127);
 }
@@ -84,9 +84,9 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 		//no command;
 		return (0);
 	}
-	if (is_builtin(cmd) == true)
-	{
-		return (exec_builtin(cmd));
-	}
+	// if (is_builtin(cmd) == true)
+	// {
+	// 	return (exec_builtin(cmd));
+	// }
 	return (exec_ext_cmd(shell, cmd, exec));
 }

@@ -12,7 +12,7 @@ BOLD	:= \033[1m
 
 NAME := Minishell
 HEADER := minishell.h
-CFLAGS := -g -I.
+CFLAGS := -g -I. -lreadline
 # -Wall -Wextra -Werror
 
 LIBFT := libs/libft/libft.a
@@ -21,6 +21,21 @@ SRC =	main.c\
 		parse.c\
 		split.c\
 		token_list.c\
+		allocation.c\
+		build_commands.c\
+		convert_envp.c\
+		envp.c\
+		exec_helper.c\
+		exec_paths.c\
+		exec_pipeline.c\
+		exec_single_command.c\
+		execution.c\
+		helper1.c\
+		heredoc.c\
+		param_helper.c\
+		signals.c\
+		validate_tokens.c\
+		expansion.c\
 
 OBJS := $(SRC:.c=.o)
 
@@ -45,6 +60,6 @@ fclean:
 	@make clean -sC libs/libft
 	@make fclean -sC libs/libft
 
-re: f all
+re: fclean all
 
 .PHONY: all clean fclean re

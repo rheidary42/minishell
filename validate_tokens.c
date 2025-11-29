@@ -32,7 +32,7 @@
 // Only EOF or empty input:
 // should be handled by main
 
-int	is_redir(t_token *tok)
+int	is_redir2(t_token *tok)
 {
 	return (tok->type == TOKEN_REDIR_OUT || tok->type == TOKEN_REDIR_IN
 		|| tok->type == TOKEN_APPEND || tok->type == TOKEN_HEREDOC);
@@ -57,7 +57,7 @@ int	validate_tokens(t_token *tokens)
 			if (curr->next == NULL || is_pipe(curr->next) != 0)
 				return (0);
 		}
-		else if (is_redir(curr) != 0)
+		else if (is_redir2(curr) != 0)
 		{
 			if (curr->next == NULL || curr->next->type != TOKEN_WORD)
 				return (0);

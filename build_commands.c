@@ -125,8 +125,10 @@ void	build_commands(t_shell *shell)
 		}
 		if (is_redir(curr) == true)
 			handle_redir(cmd, &curr, shell);
-		else if (curr->type == TOKEN_WORD && is_argv(curr) == true)
+		else if (curr->type == TOKEN_WORD && is_argv(curr) == true && curr->is_expanded == false)
 			cmd->argv[i++] = curr->value;
+		else if (curr->type == TOKEN_WORD && is_argv(curr) == true && curr->is_expanded == true)
+			cmd->argv[i++] = curr->expanded;
 		else if (curr->type == TOKEN_PIPE)
 		{
 			if (cmd != NULL)

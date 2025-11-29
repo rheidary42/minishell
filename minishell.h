@@ -112,6 +112,7 @@ typedef struct  s_exec
 
 void	print_list(t_shell *shell);
 void	build_token_list(t_shell *shell, char **arr);
+int	validate_tokens(t_token *tokens);
 char	**split(t_shell *shell);
 
 void	parse(t_shell *shell);
@@ -138,18 +139,22 @@ void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell);
 void	path_lookup(char *cmd_name, t_shell *shell, t_exec *exec);
 void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);
+void	free_func(char **to_free);
         //EXECUTION
-int	exec_ext_cmd(t_cmd *cmd, t_shell *shell, t_exec *exec);
-int	exec_single_cmd(t_shell *shell, t_exec *exec);
-int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 
+int	execution(t_shell *shell);
+int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec);
+int	exec_single_cmd(t_shell *shell, t_exec *exec);
+void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
+int	build_pipeline(t_shell *shell, t_exec *exec);
 int	make_envp(t_env *copy_env, char **curr_env);
 char	**convert_envp(t_shell *shell);
 int	free_env_list(t_env *head);
-
+int	handle_heredoc(t_shell *shell, char *delim);
 
 
 // EXPANSIONS // WILL FORMAT EVENTUALLY
+void	parameter(t_shell *shell);
 size_t	exit_status_len(int i);
 int		ifs(char c);
 void	copy_char_expansion(size_t *i, char *dest, char c);

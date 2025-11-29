@@ -29,9 +29,11 @@ int main(int ac, char **av, char **envp)
 		if (shell->line == NULL)	// If EOF (CTRL-D) detected exit
 			exit (0);
 		parse(shell);
-		if (shell->line[0] != '\0')	// Check for empty input to not clog history with empty lines
-			add_history(shell->line);
-		// execute
+		// if (shell->line[0] != '\0')	// Check for empty input to not clog history with empty lines
+		// 	add_history(shell->line);
+		print_list(shell);
+		execution(shell);
+		clean_up(shell);
 		// free
 	}
 	return (0);

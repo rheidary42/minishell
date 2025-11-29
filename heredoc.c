@@ -40,7 +40,7 @@ void	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 	while (1)
 	{
 		g_sig = 0;
-		line = readline("> ");
+		line = readline("heredoc> ");
 		if (g_sig == SIGINT)
 			clean_heredoc(tmp_file);
 		if (line == NULL || ft_strcmp(line, delim) == 0)
@@ -80,3 +80,11 @@ int	handle_heredoc(t_shell *shell, char *delim)
 	free(tmp_file);
 	return (fd);
 }
+
+
+// int	main(int ac, char **av)
+// {
+// 	t_shell *shell;
+// 	handle_heredoc(shell, av[1]);
+// 	return ;
+// }

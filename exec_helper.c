@@ -83,7 +83,10 @@ char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell)
 		b++;
 	}
 	while (s3[c] != '\0')
-		str_comb[a + b + c] = s3[c++];
+	{
+		str_comb[a + b + c] = s3[c];
+		c++;
+	}
 	str_comb[a + b + c] = '\0';
 	return (str_comb);
 }

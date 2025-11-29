@@ -30,6 +30,7 @@ t_token	*tokenize(t_shell *shell)
 void	parse(t_shell *shell)
 {
 	tokenize(shell);
+	parameter(shell);
 	build_commands(shell);
 	// while (state == in_quote)
 	// {
