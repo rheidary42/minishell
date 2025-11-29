@@ -110,7 +110,6 @@ void	build_token_list(t_shell *shell, char **arr)
 		i++;
 	}
 	free_split_arr(arr);
-	append_node(shell, new_node("EOF", shell));
 }
 //TEST TOKENIZER
 void	print_cmds(t_token **tokens, t_cmd **cmds)

@@ -12,7 +12,7 @@ BOLD	:= \033[1m
 
 NAME := Minishell
 HEADER := minishell.h
-CFLAGS := -g -I. -lreadline
+CFLAGS := -g -I. -lreadline -g3
 # -Wall -Wextra -Werror
 
 LIBFT := libs/libft/libft.a

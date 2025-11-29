@@ -39,13 +39,33 @@ void	free_tokens(t_token **tokens)
 	{
 		tmp = curr->next;
 		if (curr->value != NULL)
+		{
 			free(curr->value);
+		}
 		free(curr);
 		curr = tmp;
 	}
 	*tokens = NULL;
 }
 
+void	free_redir(t_redir **redir)
+{
+	t_redir	*curr;
+	t_redir	*tmp;
+
+	if (!redir)
+		return ;
+	curr = *redir;
+	while (curr != NULL)
+	{
+		tmp = curr -> next;
+		if (curr->file != NULL)
+			free(curr->file);
+		free(curr);
+		curr = tmp;
+	}
+	*redir = NULL;
+}
 void	free_cmds(t_cmd **cmds)
 {
 	t_cmd	*curr;
@@ -60,7 +80,9 @@ void	free_cmds(t_cmd **cmds)
 		if (curr->argv != NULL)
 			free(curr->argv);
 		if (curr->redir != NULL)
-			free(curr->redir);
+		{
+			free_redir(&curr->redir);
+		}
 		free(curr);
 		curr = tmp;
 	}

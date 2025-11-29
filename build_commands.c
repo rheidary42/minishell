@@ -79,12 +79,12 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 	if (redirection == NULL)
 		return ; // TO DO ERROR
 	redirection->type = token->type;
-	redirection->prev = NULL;
+	redirection->file = ft_safe_strdup(token->next->value, shell);
 	redirection->next = NULL;
 	if (cmd->redir == NULL)
 	{
 		cmd->redir = redirection;
-		redirection->file = ft_safe_strdup(token->next->value, shell);
+		redirection->prev = NULL;
 		return ;
 	}
 	curr = cmd->redir;
@@ -92,7 +92,6 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 		curr = curr->next;
 	curr->next = redirection;
 	redirection->prev = curr;
-	redirection->file = ft_safe_strdup(token->next->value, shell);
 }
 
 void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell)
