@@ -41,8 +41,8 @@ void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		path_lookup(cmd->argv[0], shell, exec);
 	if (exec->final_path == NULL)
 	{
-		free_and_close(shell, cmd, exec);
 		printf("%s: command not found\n", cmd->argv[0]);
+		free_and_close(shell, cmd, exec);
 		exit(127);
 	}
 	envp = convert_envp(shell);
@@ -67,7 +67,6 @@ int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		exec_in_child(shell, cmd, exec);
 	}
 	waitpid(exec->child, &status, 0);
-	close(exec->file_fd);
 	if (WIFEXITED(status) != 0)
 		shell->last_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status) != 0)
@@ -82,7 +81,7 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 	cmd = shell->cmds;
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 	{
-		handle_heredoc(shell, cmd->redir->file);
+		close(handle_heredoc(shell, cmd->redir->file));
 		return (0);
 	}
 	// if (is_builtin(cmd) == true)

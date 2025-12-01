@@ -3,6 +3,7 @@
 
 /* External libraries*/
 # include "libs/libft/libft.h"
+# include "libs/get_next_line/get_next_line.h"
 
 /* Standard library + memory + strings */
 # include <stdlib.h>
@@ -123,6 +124,7 @@ void	build_commands(t_shell *shell);
         //ALLOCATION
 void	*safe_calloc(size_t size, t_shell *shell);
 void	clean_up(t_shell *shell);
+void	free_env(t_env **env);
 
         //HELPERS
 char	*ft_safe_strdup(const char *s, t_shell *shell);

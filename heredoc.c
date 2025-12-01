@@ -51,30 +51,24 @@ void	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 	}
 	free(line);
 	close(fd);
-	exit(0);
 }
 
 int	handle_heredoc(t_shell *shell, char *delim)
 {
 	char	*tmp_file;
-	pid_t	child;
 	int		fd;
 	int		status;
 
 	tmp_file = get_here_doc_name(shell);
-	child = fork();
-	if (child == -1)
-		return (-1);
-	else if (child == 0)
-		run_heredoc(shell, tmp_file, delim);
-	waitpid(child, &status, 0);
-	if (WIFSIGNALED(status) != 0 && WTERMSIG(status) == SIGINT)
-	{
-		shell->last_exit_status = 130;
-		unlink(tmp_file);
-		free(tmp_file);
-		return (-1);
-	}
+	run_heredoc(shell, tmp_file, delim);
+	// waitpid(child, &status, 0);
+	// if (WIFSIGNALED(status) != 0 && WTERMSIG(status) == SIGINT)
+	// {
+	// 	shell->last_exit_status = 130;
+	// 	unlink(tmp_file);
+	// 	free(tmp_file);
+	// 	return (-1);
+	// }
 	fd = open(tmp_file, O_RDONLY);
 	unlink(tmp_file);
 	free(tmp_file);
@@ -85,6 +79,7 @@ int	handle_heredoc(t_shell *shell, char *delim)
 // int	main(int ac, char **av)
 // {
 // 	t_shell *shell;
-// 	handle_heredoc(shell, av[1]);
+// 	int fd = handle_heredoc(shell, av[1]);
+// 	close(fd);
 // 	return 0;
 // }

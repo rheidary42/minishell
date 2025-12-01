@@ -2,13 +2,21 @@
 
 void	print_list(t_shell *shell)
 {
-	t_token *curr = shell->tokens;
+	// t_token *curr = shell->tokens;
 
+	// while (curr != NULL)
+	// {
+	// 	printf("%s ; ", curr -> value);
+	// 	printf("%i ; ", curr -> type);
+	// 	printf("%p\n", curr -> prev);
+	// 	curr = curr->next;
+	// }
+	t_cmd	*curr = shell->cmds;
 	while (curr != NULL)
 	{
-		printf("%s ; ", curr -> value);
-		printf("%i ; ", curr -> type);
-		printf("%p\n", curr -> prev);
+		for (int i = 0; curr->argv[i] != NULL; i++)
+			printf("%s\n", curr->argv[i]);
+		free(curr->argv);
 		curr = curr->next;
 	}
 }
@@ -88,6 +96,7 @@ t_token	*new_node(char *str, t_shell *shell)
 		return (NULL);
 	new -> type = token_type(str);
 	new -> value = ft_safe_strdup(str, shell);
+	new -> expanded = NULL;
 	new -> prev = NULL;
 	new -> next = NULL;
 	return (new);

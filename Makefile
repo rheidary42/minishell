@@ -10,14 +10,15 @@ BOLD	:= \033[1m
 
 # --- config ---
 
-NAME := Minishell
+NAME := minishell
 HEADER := minishell.h
 CFLAGS := -g -I. -lreadline -g3
 # -Wall -Wextra -Werror
 
 LIBFT := libs/libft/libft.a
-
-SRC =	main.c\
+GNL_PATH := libs/get_next_line
+GNL_SRCS := $(GNL_PATH)/get_next_line.c $(GNL_PATH)/get_next_line_utils.c
+SRCS =	main.c\
 		parse.c\
 		split.c\
 		token_list.c\
@@ -36,8 +37,9 @@ SRC =	main.c\
 		signals.c\
 		validate_tokens.c\
 		expansion.c\
+		$(GNL_SRCS)\
 
-OBJS := $(SRC:.c=.o)
+OBJS := $(SRCS:.c=.o)
 
 all: $(NAME)
 
@@ -57,6 +59,7 @@ clean:
 
 fclean:
 	@rm -f $(OBJS)
+	@rm -f $(NAME)
 	@make clean -sC libs/libft
 	@make fclean -sC libs/libft
 

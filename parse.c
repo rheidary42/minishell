@@ -16,6 +16,8 @@ t_token	*tokenize(t_shell *shell)
 {
 	char	**arr;
 
+	if (shell->line[0] == '\0')
+		return (NULL);
 	arr = split(shell);
 	build_token_list(shell, arr);
 	// clean arguments

@@ -3,100 +3,78 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: boenkhja <boenkhja@student.42vienna.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/12 14:37:34 by rheidary          #+#    #+#             */
-/*   Updated: 2025/05/17 14:55:41 by rheidary         ###   ########.fr       */
+/*   Created: 2025/05/02 17:35:25 by boenkhja          #+#    #+#             */
+/*   Updated: 2025/05/02 17:35:41 by boenkhja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	is_set(char s, char const *set)
+static int	my_strlen(const char *s1)
 {
 	int	i;
 
 	i = 0;
-	while (set[i] != '\0')
+	while (s1[i] != 0)
+		i++;
+	return (i);
+}
+
+static int	check(char c, const char *set)
+{
+	int		i;
+
+	i = 0;
+	while (set[i] != 0)
 	{
-		if (s == set[i])
+		if (set[i] == c)
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
-static int	find_end(char const *s1, char const *set)
+static int	end_trim(char *str, const char *set, int end)
 {
-	int	count;
-	int	length;
-
-	count = 0;
-	length = ft_strlen (s1) - 1;
-	while (is_set(s1[length], set) == 1 && length >= 0)
-	{
-		length--;
-		count++;
-	}
-	return (count);
-}
-
-static int	find_start(char const *s1, char const *set)
-{
-	int	count;
-	int	i;
-
-	count = 0;
-	i = 0;
-	while (is_set(s1[i], set) == 1)
-	{
-		i++;
-		count++;
-	}
-	return (count);
+	while (check(str[end], set) == 1)
+		end--;
+	return (end + 1);
 }
 
 char	*ft_strtrim(char const *s1, char const *set)
 {
-	char	*redu_str;
-	int		end;
-	int		start;
+	char	*str;
+	char	*hi;
 	int		i;
 	int		j;
+	int		end;
 
 	i = 0;
-	j = ft_strlen(s1);
-	end = find_end(s1, set);
-	start = find_start(s1, set);
-	end = j - (end + start);
-	if (end < 0)
-		end = 0;
-	redu_str = ft_calloc(sizeof (char), end + 1);
-	if (!redu_str)
+	j = 0;
+	str = (char *)s1;
+	hi = NULL;
+	if (s1 == NULL)
 		return (NULL);
-	while (i < end)
-	{
-		redu_str[i] = s1[start];
+	while (str[i] != 0 && check(str[i], set) == 1)
 		i++;
-		start++;
-	}
-	redu_str[i] = '\0';
-	return (redu_str);
+	end = my_strlen(&str[i]);
+	if (check(str[end + i - 1], set) == 1 && str[i] != 0)
+		end = end_trim(&str[i], set, my_strlen(&str[i]) - 1);
+	hi = (char *)malloc((end + 1) * sizeof(char));
+	if (hi == NULL)
+		return (NULL);
+	while (str[i] != 0 && j < end)
+		hi[j++] = str[i++];
+	hi[j] = '\0';
+	return (hi);
 }
-// int main()
-// {
-// 	char * s = ft_strtrim("   xxx   xxx", " x");
-// 	printf("%s\n", s);
-// 	free(s);
-// 	return 0;
-// }
-// int main()
-// {
-// 	char *teststring = "Basketball";
-// 	char *testset = "Bal";
-// 	char *testresult = ft_strtrim(teststring, testset);
-
-// 	printf("Test result: %s", testresult);
-// 	return (0);
-// }
-//			TESTED AND WORKS + NORM COMPLIANT
+/*
+int	main(void)
+{
+	char	str[] = " lorem ipsum dolor sit amet";
+	char	set[] = "l ";
+	printf("res = %s\n", ft_strtrim("   xxx   xxx", " x"));
+	return 0;
+}*/

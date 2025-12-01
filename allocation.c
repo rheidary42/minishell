@@ -27,6 +27,27 @@ void	*safe_calloc(size_t size, t_shell *shell)
 	return (ptr);
 }
 
+void	free_env(t_env **env)
+{
+	t_env	*curr;
+	t_env	*tmp;
+
+	if (!env)
+		return ;
+	curr = *env;
+	while (curr != NULL)
+	{
+		tmp = curr->next;
+		if (curr->name)
+			free(curr->name);
+		if (curr->value)
+			free(curr->value);
+		free(curr);
+		curr = tmp;
+	}
+	*env = NULL;
+}
+
 void	free_tokens(t_token **tokens)
 {
 	t_token	*curr;
@@ -38,10 +59,10 @@ void	free_tokens(t_token **tokens)
 	while (curr != NULL)
 	{
 		tmp = curr->next;
-		if (curr->value != NULL)
-		{
+		if (curr->expanded)
+			free(curr->expanded);
+		if (curr->value)
 			free(curr->value);
-		}
 		free(curr);
 		curr = tmp;
 	}
@@ -80,9 +101,7 @@ void	free_cmds(t_cmd **cmds)
 		if (curr->argv != NULL)
 			free(curr->argv);
 		if (curr->redir != NULL)
-		{
 			free_redir(&curr->redir);
-		}
 		free(curr);
 		curr = tmp;
 	}
