@@ -3,7 +3,7 @@
 
 /* External libraries*/
 # include "libs/libft/libft.h"
-# include "libs/get_next_line/get_next_line.h"
+//# include "libs/get_next_line/get_next_line.h"
 
 /* Standard library + memory + strings */
 # include <stdlib.h>
@@ -159,6 +159,6 @@ int	handle_heredoc(t_shell *shell, char *delim);
 void	parameter(t_shell *shell);
 size_t	exit_status_len(int i);
 int		ifs(char c);
-void	copy_char_expansion(size_t *i, char *dest, char c);
+void	copy_char_expansion(size_t *i, t_token *token, char c, int *in_quote);
 
 #endif

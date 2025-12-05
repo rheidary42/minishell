@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/28 16:53:06 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/05 18:03:20 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,15 +150,16 @@ void	handle_var(size_t *i, int *in_quote, t_token *token, t_shell *shell)
 	var_len = ft_strlen(var_value);
 	while (j < var_len)
 	{
-		copy_char_expansion(i, token->expanded, var_value[j]);
+		copy_char_expansion(i, token, var_value[j], in_quote);
 		j++;
 	}
 	free(var_value);
 }
 
-void	copy_char_expansion(size_t *i, char *dest, char c)
+void	copy_char_expansion(size_t *i, t_token *token, char c, int *in_quote)
 {
-	dest[i[1]] = c;
+	token->expanded[i[1]] = c;
+	token->dq_mask[i[1]] = (*in_quote == 1);
 	i[1]++;
 }
 
@@ -173,6 +174,11 @@ void	copy_char_original(size_t *i, int *in_quote, t_token *token)
 	else if (token->value[i[0]] == '\'')
 		*in_quote = 2;
 	if (*in_quote == 1)
+		token->dq_mask[i[1]] = true;
+	// Hard coded addition to fix masking issues (maybe problematic)
+	// Masking issue: Either first or last mask will be 0 instead of 1 in dq
+	// Because of the order in which it will assigned and evaluated
+	else if (*in_quote == 0 && token->value[i[0]] == '\"')
 		token->dq_mask[i[1]] = true;
 	else
 		token->dq_mask[i[1]] = false;
@@ -230,10 +236,23 @@ void	parameter(t_shell *shell)
 
 // ////////////////////////////////////
 
-// void	word(t_shell *shell)
-// {
-	
-// }
+void	word(t_shell *shell)
+{
+	t_token *curr;
+
+	// CASE 1.2: EOB
+	if (shell->tokens->expanded == 0)
+		return ;
+	// CASE 1.1
+	curr = shell->tokens;
+	while (curr != NULL)
+	{
+		if (curr->is_expanded)
+		{
+			
+		}
+	}
+}
 
 // ////////////////////////////////////
 
@@ -242,6 +261,8 @@ void	parameter(t_shell *shell)
 	
 // }
 
+///////////////////////////////////////
+
 // void	expand(t_shell *shell)
 // {
 // 	parameter(shell);
@@ -249,52 +270,55 @@ void	parameter(t_shell *shell)
 // 	quote(shell);
 // }
 
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
 
-// === TESTER ===
+// // === TESTER ===
 
-/* Helper to create a new environment variable */
-t_env *new_env(const char *name, const char *value)
-{
-    t_env *env = malloc(sizeof(t_env));
-    if (!env)
-        return NULL;
-    env->name = strdup(name);
-    env->value = strdup(value);
-    env->next = NULL;
-    return env;
-}
+// /* Helper to create a new environment variable */
+// t_env *new_env(const char *name, const char *value)
+// {
+//     t_env *env = malloc(sizeof(t_env));
+//     if (!env)
+//         return NULL;
+//     env->name = strdup(name);
+//     env->value = strdup(value);
+//     env->next = NULL;
+//     return env;
+// }
 
-/* Helper to add env to shell */
-void add_env(t_shell *shell, t_env *env)
-{
-    if (!shell->env)
-        shell->env = env;
-    else
-    {
-        t_env *tmp = shell->env;
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = env;
-    }
-}
+// /* Helper to add env to shell */
+// void add_env(t_shell *shell, t_env *env)
+// {
+//     if (!shell->env)
+//         shell->env = env;
+//     else
+//     {
+//         t_env *tmp = shell->env;
+//         while (tmp->next)
+//             tmp = tmp->next;
+//         tmp->next = env;
+//     }
+// }
 
-/* Helper to create a new token */
-t_token *new_token(const char *value)
-{
-    t_token *token = malloc(sizeof(t_token));
-    if (!token)
-        return NULL;
-    token->value = strdup(value);
-    token->expanded = NULL;
-    token->dq_mask = NULL;
-    token->is_expanded = false;
-    token->type = TOKEN_WORD;
-    token->next = NULL;
-    token->prev = NULL;
-    return token;
-}
+// /* Helper to create a new token */
+// t_token *new_token(const char *value)
+// {
+//     t_token *token = malloc(sizeof(t_token));
+//     if (!token)
+//         return NULL;
+//     token->value = strdup(value);
+//     token->expanded = NULL;
+//     token->dq_mask = NULL;
+//     token->is_expanded = false;
+//     token->type = TOKEN_WORD;
+//     token->next = NULL;
+//     token->prev = NULL;
+//     return token;
+// }
 
-/* Print expanded token values */
+// /* Print expanded token values */
 // void print_tokens(t_shell *shell)
 // {
 //     t_token *curr = shell->tokens;
@@ -328,7 +352,8 @@ t_token *new_token(const char *value)
 //     /* Setup tokens */
 //     shell.tokens = new_token("Hello $USER!");
 //     shell.tokens->next = new_token("Your home is $HOME.");
-// 	shell.tokens->next = new_token("\"User: $USER\"");
+// 	shell.tokens->next->next = new_token("\"User: $USER\"");
+// 	shell.tokens->next->next->next = new_token("\"$USER\"$USER'$USER'");
 
 //     /* Run expansion */
 //     parameter(&shell);
