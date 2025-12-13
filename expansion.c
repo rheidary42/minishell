@@ -6,12 +6,13 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/05 18:03:20 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/13 18:05:19 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+//	Calculate the length of the variable's value for expansion
 size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 {
 	char	*var_name;
@@ -20,9 +21,9 @@ size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 	size_t	len;
 
 	len = 0;
-	var_end = *var_start;
 	if (value[*var_start] == '?')
 		return (*var_start += 1, exit_status_len(shell->last_exit_status));
+	var_end = *var_start;
 	while (value[var_end] && (ft_isalnum(value[var_end])) != 0)
 		var_end++;
 	var_name = ft_substr(value, *var_start, var_end - *var_start);
@@ -64,6 +65,8 @@ size_t	calc_expanded_size(char *value, t_shell *shell)
 	return (len);
 }
 
+// Add '_' potentially, ask around and look in manual
+// INFO: '_' only in POSIX implementations -> Fuck it (?)
 int	needs_expansions(t_token *token)
 {
 	int	i;
@@ -73,7 +76,6 @@ int	needs_expansions(t_token *token)
 	i = 0;
 	while (token->value[i])
 	{
-		//test'hi'
 		if (token->value[i] == '\'')
 		{
 			i++;
@@ -83,10 +85,7 @@ int	needs_expansions(t_token *token)
 			if (token->value[i] == '\0')
 				return (EXIT_FAILURE);
 		}
-		// Add '_' potentially, ask around and look in manual
-		// INFO: '_' only in POSIX implementations -> Fuck it (?)
-		if ((token->value[i] == '$' && ft_isalpha(token->value[i + 1]))
-			|| (token->value[i] == '$' && token->value[i + 1] == '?'))
+		if (is_expandable_var(token->value, i, NO_QUOTE))
 			return (EXIT_SUCCESS);
 		i++;
 	}
@@ -129,89 +128,77 @@ void	insert_exit_status(t_token *token, t_shell *shell)
 	return ;
 }
 
-void	handle_var(size_t *i, int *in_quote, t_token *token, t_shell *shell)
+void	handle_var(t_expand_pos *pos, t_quote *quote_state,
+			t_token *token, t_shell *shell)
 {
 	char	*var_value;
 	size_t	var_len;
 	size_t	j;
 
-	if (*in_quote != 2)
-		i[0]++;
-	if (token->value[i[0]] == '?')
+	if (*quote_state != SINGLE_QUOTE)
+		pos->val++;
+	if (token->value[pos->val] == '?')
 	{
 		insert_exit_status(token, shell);
-		i[0]++;
+		pos->val++;
 		return ;
 	}
-	var_value = get_var_value(get_var_name(token->value, &i[0]), shell);
+	var_value = get_var_value(get_var_name(token->value, &pos->val), shell);
 	if (!var_value)
 		return ;
 	j = 0;
 	var_len = ft_strlen(var_value);
 	while (j < var_len)
 	{
-		copy_char_expansion(i, token, var_value[j], in_quote);
+		copy_char_expansion(pos, token, var_value[j], quote_state);
 		j++;
 	}
 	free(var_value);
 }
 
-void	copy_char_expansion(size_t *i, t_token *token, char c, int *in_quote)
+void	copy_char_expansion(t_expand_pos *pos, t_token *token,
+		char c, t_quote *quote_state)
 {
-	token->expanded[i[1]] = c;
-	token->dq_mask[i[1]] = (*in_quote == 1);
-	i[1]++;
+	token->expanded[pos->exp] = c;
+	token->dq_mask[pos->exp] = (*quote_state == DOUBLE_QUOTE);
+	pos->exp++;
 }
 
-void	copy_char_original(size_t *i, int *in_quote, t_token *token)
+// Masking issue: Either first or last mask will be 0 instead of 1 in dq
+// Because of the order in which it will assigned and evaluated
+// Hard coded solution (else if) to fix masking issues (maybe problematic)
+void	copy_char_original(t_expand_pos *pos, t_quote *quote_state,
+		t_token *token)
 {
-	if (token->value[i[0]] == '\"' && *in_quote == 1)
-		*in_quote = 0;
-	else if (token->value[i[0]] == '\"')
-		*in_quote = 1;
-	if (token->value[i[0]] == '\'' && *in_quote == 2)
-		*in_quote = 0;
-	else if (token->value[i[0]] == '\'')
-		*in_quote = 2;
-	if (*in_quote == 1)
-		token->dq_mask[i[1]] = true;
-	// Hard coded addition to fix masking issues (maybe problematic)
-	// Masking issue: Either first or last mask will be 0 instead of 1 in dq
-	// Because of the order in which it will assigned and evaluated
-	else if (*in_quote == 0 && token->value[i[0]] == '\"')
-		token->dq_mask[i[1]] = true;
+	update_quote_state(token->value[pos->val], quote_state);
+	if (*quote_state == DOUBLE_QUOTE)
+		token->dq_mask[pos->exp] = true;
+	else if (*quote_state == NO_QUOTE && token->value[pos->val] == '\"')
+		token->dq_mask[pos->exp] = true;
 	else
-		token->dq_mask[i[1]] = false;
-	token->expanded[i[1]++] = token->value[i[0]++];
+		token->dq_mask[pos->exp] = false;
+	token->expanded[pos->exp++] = token->value[pos->val++];
 }
 
-//	i[0] = tracking value
-//	i[1] = tracking expanded value
-//	in_quote = 1 -> double quotes
-//	in_quote = 2 -> single quotes
-//	A little unhinged but if i don't understand it in a week
-//	and you don't understand it ever and the evaluator doesn't
-//	even know what hes looking at, then we can't fail because
-//	noone understands anything :5head:
+//	Copy characters from token->value to token->expanded, expanding $vars
+//	pos.val = index in token->value
+//	pos.exp = index in token->expanded
 void	expand_value(t_token *token, t_shell *shell, size_t len)
 {
-	int		in_quote;
-	size_t	i[2];
+	t_quote			quote_state;
+	t_expand_pos	pos;
 
 	token->expanded = safe_calloc(len + 1, shell);
 	token->dq_mask = safe_calloc(len, shell);
-	// "$var"hi'$var'
-	in_quote = 0;
-	i[0] = 0;
-	i[1] = 0;
-	while (i[1] < len)
+	quote_state = NO_QUOTE;
+	pos.val = 0;
+	pos.exp = 0;
+	while (pos.exp < len)
 	{
-		if (token->value[i[0]] == '$' && in_quote != 2
-			&& (ft_isalpha(token->value[i[0] + 1])
-				|| token->value[i[0] + 1] == '?'))
-			handle_var(i, &in_quote, token, shell);
+		if (is_expandable_var(token->value, pos.val, quote_state))
+			handle_var(&pos, &quote_state, token, shell);
 		else
-			copy_char_original(i, &in_quote, token);
+			copy_char_original(&pos, &quote_state, token);
 	}
 }
 
@@ -225,8 +212,7 @@ void	parameter(t_shell *shell)
 		if (needs_expansions(curr) == EXIT_SUCCESS)
 		{
 			curr->is_expanded = true;
-			expand_value(curr, shell,
-				calc_expanded_size(curr->value, shell));
+			expand_value(curr, shell, calc_expanded_size(curr->value, shell));
 		}
 		else
 			curr->is_expanded = false;
@@ -236,6 +222,7 @@ void	parameter(t_shell *shell)
 
 // ////////////////////////////////////
 
+/* TO-DO*/
 void	word(t_shell *shell)
 {
 	t_token *curr;
@@ -256,6 +243,7 @@ void	word(t_shell *shell)
 
 // ////////////////////////////////////
 
+/* TO-DO*/
 // void	quote(t_shell *shell)
 // {
 	

@@ -6,12 +6,13 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:57:48 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/25 06:13:05 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/13 18:06:52 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+// TO-DO Add actual exit-code to exit()
 void	*safe_calloc(size_t size, t_shell *shell)
 {
 	void	*ptr;
@@ -27,6 +28,7 @@ void	*safe_calloc(size_t size, t_shell *shell)
 	return (ptr);
 }
 
+// TO-DO pre-set all values to NULL so if conditions work properly
 void	free_env(t_env **env)
 {
 	t_env	*curr;
@@ -48,6 +50,7 @@ void	free_env(t_env **env)
 	*env = NULL;
 }
 
+// TO-DO pre-set all values to NULL so if conditions work properly
 void	free_tokens(t_token **tokens)
 {
 	t_token	*curr;
@@ -69,6 +72,7 @@ void	free_tokens(t_token **tokens)
 	*tokens = NULL;
 }
 
+// TO-DO pre-set all values to NULL so if conditions work properly
 void	free_redir(t_redir **redir)
 {
 	t_redir	*curr;
@@ -87,6 +91,7 @@ void	free_redir(t_redir **redir)
 	}
 	*redir = NULL;
 }
+
 void	free_cmds(t_cmd **cmds)
 {
 	t_cmd	*curr;

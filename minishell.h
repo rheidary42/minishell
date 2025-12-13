@@ -42,6 +42,19 @@
 
 extern volatile sig_atomic_t	g_sig;
 
+typedef struct s_expand_pos
+{
+	size_t	val;
+	size_t	exp;
+}	t_expand_pos;
+
+typedef enum e_quote
+{
+	NO_QUOTE = 0,
+	DOUBLE_QUOTE = 1,
+	SINGLE_QUOTE = 2
+}	t_quote;
+
 typedef enum e_toktype
 {
     TOKEN_WORD,        // command or argument
@@ -159,6 +172,9 @@ int	handle_heredoc(t_shell *shell, char *delim);
 void	parameter(t_shell *shell);
 size_t	exit_status_len(int i);
 int		ifs(char c);
-void	copy_char_expansion(size_t *i, t_token *token, char c, int *in_quote);
+int		is_expandable_var(char *value, size_t index, t_quote quote_state);
+void	update_quote_state(char c, t_quote *quote_state);
+void	copy_char_expansion(t_expand_pos *pos, t_token *token,
+		char c, t_quote *quote_state);
 
 #endif
