@@ -42,11 +42,11 @@
 
 extern volatile sig_atomic_t	g_sig;
 
-typedef struct s_expand_pos
+typedef struct s_pos
 {
 	size_t	val;
 	size_t	exp;
-}	t_expand_pos;
+}	t_pos;
 
 typedef enum e_quote
 {
@@ -174,7 +174,7 @@ size_t	exit_status_len(int i);
 int		ifs(char c);
 int		is_expandable_var(char *value, size_t index, t_quote quote_state);
 void	update_quote_state(char c, t_quote *quote_state);
-void	copy_char_expansion(t_expand_pos *pos, t_token *token,
+void	copy_char_expansion(t_pos *pos, t_token *token,
 		char c, t_quote *quote_state);
 
 #endif
