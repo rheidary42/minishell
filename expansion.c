@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/13 20:47:29 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/13 21:22:23 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ size_t	calc_expanded_size(char *value, t_shell *shell)
 			i++;
 			len++;
 		}
-		else if (value[i] == '$' && ++i)
+		else if (is_expandable_var(value, i, NO_QUOTE) && ++i)
 			len += get_var_len(value, &i, shell);
 		else if (++i)
 			len++;
@@ -234,7 +234,11 @@ void	parameter(t_shell *shell)
 			expand_value(curr, shell, calc_expanded_size(curr->value, shell));
 		}
 		else
+		{
 			curr->is_expanded = false;
+			curr->expanded = NULL;
+			curr->dq_mask = NULL;
+		}
 		curr = curr->next;
 	}
 }
@@ -283,7 +287,7 @@ void	word(t_shell *shell)
 
 // // === TESTER ===
 
-// /* Helper to create a new environment variable */
+// // /* Helper to create a new environment variable */
 // t_env *new_env(const char *name, const char *value)
 // {
 //     t_env *env = malloc(sizeof(t_env));
@@ -357,11 +361,12 @@ void	word(t_shell *shell)
 //     shell.last_exit_status = 42;
 
 //     /* Setup tokens */
-//		shell.tokens = new_token("Hello $USER!");
-//		shell.tokens->next = new_token("Your home is $HOME.");
-//		shell.tokens->next->next = new_token("\"User: $USER\"");
-//		shell.tokens->next->next->next = new_token("\"$USER\"$USER'$USER'");
-//		shell.tokens->next->next->next->next = new_token("$?'$?'\"$?\"");
+// 		shell.tokens = new_token("Hello $USER!");
+// 		shell.tokens->next = new_token("Your home is $HOME.");
+// 		shell.tokens->next->next = new_token("\"User: $USER\"");
+// 		shell.tokens->next->next->next = new_token("\"$USER\"$USER'$USER'");
+// 		shell.tokens->next->next->next->next = new_token("$?'$?'\"$?\"");
+// 		shell.tokens->next->next->next->next->next = new_token("$$'$'\"$$\"");
 
 //     /* Run expansion */
 //     parameter(&shell);
