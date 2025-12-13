@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/13 18:05:19 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/13 20:47:29 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,12 +123,31 @@ char	*get_var_name(char *value, size_t *var_start)
 	return (var_name);
 }
 
-void	insert_exit_status(t_token *token, t_shell *shell)
+void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell,
+			t_quote *quote_state)
 {
-	return ;
+	char	*exit_status;
+	char	*dest;
+	int		exit_len;
+	int		i;
+
+	exit_status = ft_itoa(shell->last_exit_status);
+	if (exit_status == NULL)
+		clean_up(shell);
+	dest = shell->tokens->expanded + pos->exp;
+	exit_len = exit_status_len(shell->last_exit_status);
+	i = -1;
+	while (++i < exit_len)
+	{
+		if (*quote_state == DOUBLE_QUOTE)
+			token->dq_mask[pos->exp + i] = true;
+		token->expanded[pos->exp + i] = exit_status[i];
+	}
+	pos->exp += exit_len;
+	free(exit_status);
 }
 
-void	handle_var(t_expand_pos *pos, t_quote *quote_state,
+void	handle_var(t_pos *pos, t_quote *quote_state,
 			t_token *token, t_shell *shell)
 {
 	char	*var_value;
@@ -139,7 +158,7 @@ void	handle_var(t_expand_pos *pos, t_quote *quote_state,
 		pos->val++;
 	if (token->value[pos->val] == '?')
 	{
-		insert_exit_status(token, shell);
+		insert_exit_status(pos, token, shell, quote_state);
 		pos->val++;
 		return ;
 	}
@@ -156,7 +175,7 @@ void	handle_var(t_expand_pos *pos, t_quote *quote_state,
 	free(var_value);
 }
 
-void	copy_char_expansion(t_expand_pos *pos, t_token *token,
+void	copy_char_expansion(t_pos *pos, t_token *token,
 		char c, t_quote *quote_state)
 {
 	token->expanded[pos->exp] = c;
@@ -167,7 +186,7 @@ void	copy_char_expansion(t_expand_pos *pos, t_token *token,
 // Masking issue: Either first or last mask will be 0 instead of 1 in dq
 // Because of the order in which it will assigned and evaluated
 // Hard coded solution (else if) to fix masking issues (maybe problematic)
-void	copy_char_original(t_expand_pos *pos, t_quote *quote_state,
+void	copy_char_original(t_pos *pos, t_quote *quote_state,
 		t_token *token)
 {
 	update_quote_state(token->value[pos->val], quote_state);
@@ -186,7 +205,7 @@ void	copy_char_original(t_expand_pos *pos, t_quote *quote_state,
 void	expand_value(t_token *token, t_shell *shell, size_t len)
 {
 	t_quote			quote_state;
-	t_expand_pos	pos;
+	t_pos			pos;
 
 	token->expanded = safe_calloc(len + 1, shell);
 	token->dq_mask = safe_calloc(len, shell);
@@ -338,10 +357,11 @@ void	word(t_shell *shell)
 //     shell.last_exit_status = 42;
 
 //     /* Setup tokens */
-//     shell.tokens = new_token("Hello $USER!");
-//     shell.tokens->next = new_token("Your home is $HOME.");
-// 	shell.tokens->next->next = new_token("\"User: $USER\"");
-// 	shell.tokens->next->next->next = new_token("\"$USER\"$USER'$USER'");
+//		shell.tokens = new_token("Hello $USER!");
+//		shell.tokens->next = new_token("Your home is $HOME.");
+//		shell.tokens->next->next = new_token("\"User: $USER\"");
+//		shell.tokens->next->next->next = new_token("\"$USER\"$USER'$USER'");
+//		shell.tokens->next->next->next->next = new_token("$?'$?'\"$?\"");
 
 //     /* Run expansion */
 //     parameter(&shell);
