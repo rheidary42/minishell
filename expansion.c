@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/15 17:56:26 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/15 22:56:55 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,50 +226,148 @@ void	parameter(t_shell *shell)
 
 // ////////////////////////////////////
 
-// // Check if anything has been expanded in DQ
-// bool	needs_splitting(t_token *curr)
-// {
-// 	int		i;
-// 	char	*value;
 
-// 	i = 0;
-// 	value = curr->expanded;
-// 	while (value[i] != '\0')
-// 	{
-// 		if (curr->ws_mask[i] == true)
-// 			return (true);
-// 		i++;
-// 	}
-// 	return (false);
-// }
+/* TO-DO*/
+/*NOTES:
+	Calculate minimum amount of tokens -> hi$var"var"/00111000 = 3 tokens min
+	Make new tokens for every swap amount i.e. for every swap between 0 and 1
+	
+	Out of resulting tokens find the ones containing ws_mask
+	Split the value saving it inside of a str array
+	Make tokens out of the str array
+	*/
 
-// // Create multiple tokens out of one
-// /*NOTES:
-// 	Preserve leading IFS */
+// Check for any occurence of ws_mask
+bool	needs_splitting(t_token *curr)
+{
+	int		i;
+	char	*value;
+
+	i = 0;
+	value = curr->expanded;
+	while (value[i] != '\0')
+	{
+		if (curr->ws_mask[i] == true)
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
 // void	split_value(t_token *token)
 // {
-	
-// }
+// 	int	i;
 
-// /* TO-DO*/
-// void	word(t_shell *shell)
-// {
-// 	t_token	*curr;
-
-// 	// CASE 1.2: EOB
-// 	if (shell->tokens->expanded == 0)
-// 		return ;
-// 	// CASE 1.1
-// 	curr = shell->tokens;
-// 	while (curr != NULL)
+// 	i = 0;
+// 	while (token->expanded[i])
 // 	{
-// 		if (curr->is_expanded == true && needs_splitting(curr) == true)
+// 		if (is_splitable() == true)
 // 		{
-// 			split_value(curr);
+			
 // 		}
-// 		curr = curr->next;
+// 		i++;
 // 	}
 // }
+
+int	calc_token_size(t_token *token, int *index)
+{
+	int		i;
+	int		pos;
+	bool	state;
+
+	i = 0;
+	pos = *index;
+	state = token->ws_mask[pos];
+	while (token->ws_mask[pos + i] == state)
+	{
+		i++;
+	}
+	*index += i;
+	return (i);
+}
+
+void	generate_sub_token(t_token *new, t_token *curr, int pos, t_shell *shell)
+{
+	static int	tracker = 0;
+	int			i;
+
+	new->type = TOKEN_WORD;
+	new->is_expanded = true;
+	new->value = NULL;
+	new->expanded = safe_calloc(pos - tracker, shell);
+	new->ws_mask = safe_calloc(pos - tracker, shell);
+	i = 0;
+	while (pos > tracker)
+	{
+		new->expanded[i] = curr->expanded[tracker];
+		new->ws_mask[i] = curr->ws_mask[tracker];
+		tracker++;
+		i++;
+	}
+	return ;
+}
+
+t_token	*append_token(t_token *new, t_token *curr,
+		int token_count, t_shell *shell)
+{
+	static int	iterations = 0;
+	t_token		*newer;
+
+	newer = safe_calloc(sizeof(t_token), shell);
+	if (iterations != token_count - 1)
+		new->next = newer;
+	else
+		new->next = curr->next;
+	if (iterations == 0)
+		new->prev = curr->prev;
+	else
+		newer->prev = new;
+	iterations++;
+	return (newer);
+}
+
+void	generate_base_tokens(t_token *curr, int token_count, t_shell *shell)
+{
+	t_token	*new;
+	int		start;
+
+	start = 0;
+	if (token_count == 1)
+		return ;
+	while (token_count-- > 0)
+	{
+		if (start == 0)
+			new = safe_calloc(sizeof(t_token), shell);
+		generate_sub_token(new, curr, start, shell);
+		new = append_token(new, curr, token_count, shell);
+	}
+}
+
+void	word(t_shell *shell)
+{
+	t_token	*curr;
+
+	curr = shell->tokens;
+	while (curr != NULL)
+	{
+		if (curr->type == TOKEN_WORD && curr->is_expanded == true)
+		{
+			if (needs_splitting(curr) == true)
+				generate_base_tokens(curr, calc_min_tokens(curr), shell);
+		}
+		curr = curr->next;
+	}
+	curr = shell->tokens;
+	while (curr != NULL)
+	{
+		if (curr->type == TOKEN_WORD && curr->is_expanded == true)
+		{
+			if (needs_splitting(curr) == true)
+				split_value(curr);
+		}
+		curr = curr->next;
+	}
+}
 
 // ////////////////////////////////////
 
