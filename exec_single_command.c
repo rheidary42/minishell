@@ -41,7 +41,7 @@ void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if (is_builtin(cmd->argv[0]) == 1)
 	{
-		shell->last_exit_status = exec_builtin(cmd);
+		shell->last_exit_status = exec_builtin(cmd, envp);
 		free_and_close(shell, exec, envp);
 		exit(shell->last_exit_status);
 	}
