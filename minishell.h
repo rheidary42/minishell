@@ -144,6 +144,7 @@ char	*ft_safe_strdup(const char *s, t_shell *shell);
 char	*ft_strcpy(char *dest, char *src);
 
         //EXECUTION HELPERS
+int     is_builtin(char *cmd);
 char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell);
 bool	is_direct_path(char *executable);
 void	initialise_exec(t_exec *exec);
