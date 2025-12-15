@@ -58,7 +58,7 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 				perror("pipe");
 		exec->child = fork();
 		if (exec->child == -1)
-			perror("fork");
+			return (perror("fork"), 1);
 		else if (exec->child == 0)
 			exec_cmd(shell, cmd, exec);
 		if (exec->prev_fd != -1)
