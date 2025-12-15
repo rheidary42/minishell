@@ -19,7 +19,8 @@ void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
 	free_func(exec->all_paths);
 	free_func(cmd->argv);
-	free(exec->final_path);
+	if (exec->final_path)
+		free(exec->final_path);
 	if (exec->pipe_fds[0] != -1)
 	{
 		close(exec->pipe_fds[0]);
