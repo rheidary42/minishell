@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	is_builtin(const char *cmd)
+int	is_builtin(char *cmd)
 {
 	if (ft_strcmp(cmd, "echo") == 0)
 		return (1);
