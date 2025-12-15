@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/13 21:22:23 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/15 17:56:26 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell,
 	while (++i < exit_len)
 	{
 		if (*quote_state == DOUBLE_QUOTE)
-			token->dq_mask[pos->exp + i] = true;
+			token->ws_mask[pos->exp + i] = true;
 		token->expanded[pos->exp + i] = exit_status[i];
 	}
 	pos->exp += exit_len;
@@ -169,34 +169,12 @@ void	handle_var(t_pos *pos, t_quote *quote_state,
 	var_len = ft_strlen(var_value);
 	while (j < var_len)
 	{
-		copy_char_expansion(pos, token, var_value[j], quote_state);
+		token->expanded[pos->exp] = var_value[j];
+		token->ws_mask[pos->exp] = (*quote_state == NO_QUOTE);
+		pos->exp++;
 		j++;
 	}
 	free(var_value);
-}
-
-void	copy_char_expansion(t_pos *pos, t_token *token,
-		char c, t_quote *quote_state)
-{
-	token->expanded[pos->exp] = c;
-	token->dq_mask[pos->exp] = (*quote_state == DOUBLE_QUOTE);
-	pos->exp++;
-}
-
-// Masking issue: Either first or last mask will be 0 instead of 1 in dq
-// Because of the order in which it will assigned and evaluated
-// Hard coded solution (else if) to fix masking issues (maybe problematic)
-void	copy_char_original(t_pos *pos, t_quote *quote_state,
-		t_token *token)
-{
-	update_quote_state(token->value[pos->val], quote_state);
-	if (*quote_state == DOUBLE_QUOTE)
-		token->dq_mask[pos->exp] = true;
-	else if (*quote_state == NO_QUOTE && token->value[pos->val] == '\"')
-		token->dq_mask[pos->exp] = true;
-	else
-		token->dq_mask[pos->exp] = false;
-	token->expanded[pos->exp++] = token->value[pos->val++];
 }
 
 //	Copy characters from token->value to token->expanded, expanding $vars
@@ -208,7 +186,7 @@ void	expand_value(t_token *token, t_shell *shell, size_t len)
 	t_pos			pos;
 
 	token->expanded = safe_calloc(len + 1, shell);
-	token->dq_mask = safe_calloc(len, shell);
+	token->ws_mask = safe_calloc(len, shell);
 	quote_state = NO_QUOTE;
 	pos.val = 0;
 	pos.exp = 0;
@@ -217,7 +195,10 @@ void	expand_value(t_token *token, t_shell *shell, size_t len)
 		if (is_expandable_var(token->value, pos.val, quote_state))
 			handle_var(&pos, &quote_state, token, shell);
 		else
-			copy_char_original(&pos, &quote_state, token);
+		{
+			update_quote_state(token->value[pos.val], &quote_state);
+			token->expanded[pos.exp++] = token->value[pos.val++];
+		}
 	}
 }
 
@@ -237,7 +218,7 @@ void	parameter(t_shell *shell)
 		{
 			curr->is_expanded = false;
 			curr->expanded = NULL;
-			curr->dq_mask = NULL;
+			curr->ws_mask = NULL;
 		}
 		curr = curr->next;
 	}
@@ -245,24 +226,50 @@ void	parameter(t_shell *shell)
 
 // ////////////////////////////////////
 
-/* TO-DO*/
-void	word(t_shell *shell)
-{
-	t_token *curr;
+// // Check if anything has been expanded in DQ
+// bool	needs_splitting(t_token *curr)
+// {
+// 	int		i;
+// 	char	*value;
 
-	// CASE 1.2: EOB
-	if (shell->tokens->expanded == 0)
-		return ;
-	// CASE 1.1
-	curr = shell->tokens;
-	while (curr != NULL)
-	{
-		if (curr->is_expanded)
-		{
-			
-		}
-	}
-}
+// 	i = 0;
+// 	value = curr->expanded;
+// 	while (value[i] != '\0')
+// 	{
+// 		if (curr->ws_mask[i] == true)
+// 			return (true);
+// 		i++;
+// 	}
+// 	return (false);
+// }
+
+// // Create multiple tokens out of one
+// /*NOTES:
+// 	Preserve leading IFS */
+// void	split_value(t_token *token)
+// {
+	
+// }
+
+// /* TO-DO*/
+// void	word(t_shell *shell)
+// {
+// 	t_token	*curr;
+
+// 	// CASE 1.2: EOB
+// 	if (shell->tokens->expanded == 0)
+// 		return ;
+// 	// CASE 1.1
+// 	curr = shell->tokens;
+// 	while (curr != NULL)
+// 	{
+// 		if (curr->is_expanded == true && needs_splitting(curr) == true)
+// 		{
+// 			split_value(curr);
+// 		}
+// 		curr = curr->next;
+// 	}
+// }
 
 // ////////////////////////////////////
 
@@ -321,7 +328,7 @@ void	word(t_shell *shell)
 //         return NULL;
 //     token->value = strdup(value);
 //     token->expanded = NULL;
-//     token->dq_mask = NULL;
+//     token->ws_mask = NULL;
 //     token->is_expanded = false;
 //     token->type = TOKEN_WORD;
 //     token->next = NULL;
@@ -338,10 +345,10 @@ void	word(t_shell *shell)
 //         printf("Original: [%s]\n", curr->value);
 //         printf("Expanded: [%s]\n", curr->expanded ? curr->expanded : "(null)");
 //         printf("Double-quote mask: ");
-//         if (curr->dq_mask)
+//         if (curr->ws_mask)
 //         {
 //             for (size_t i = 0; i < strlen(curr->expanded); i++)
-//                 printf("%d", curr->dq_mask[i]);
+//                 printf("%d", curr->ws_mask[i]);
 //         }
 //         printf("\n\n");
 //         curr = curr->next;

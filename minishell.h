@@ -71,7 +71,7 @@ typedef struct s_token
     t_toktype       type;
     char            *value;
 	char			*expanded;
-	bool			*dq_mask;
+	bool			*ws_mask;
 	bool			is_expanded;
     struct s_token  *next;
     struct s_token  *prev;
