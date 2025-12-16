@@ -6,12 +6,15 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 20:23:59 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/15 22:56:55 by rheidary         ###   ########.fr       */
+/*   Updated: 2025/12/16 22:39:59 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+
+/* Modularity, keep scalable. Have crates that can be handled appropriately.
+   Handle issues appropriately*/
 //	Calculate the length of the variable's value for expansion
 size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 {
@@ -235,6 +238,13 @@ void	parameter(t_shell *shell)
 	Out of resulting tokens find the ones containing ws_mask
 	Split the value saving it inside of a str array
 	Make tokens out of the str array
+
+
+	Modules:
+	Layer 1 - Analysis
+	Layer 2 - Slice extraction
+	Layer 3 - Token creation
+	Layer 4 - List replacement
 	*/
 
 // Check for any occurence of ws_mask
@@ -254,21 +264,6 @@ bool	needs_splitting(t_token *curr)
 	return (false);
 }
 
-// void	split_value(t_token *token)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	while (token->expanded[i])
-// 	{
-// 		if (is_splitable() == true)
-// 		{
-			
-// 		}
-// 		i++;
-// 	}
-// }
-
 int	calc_token_size(t_token *token, int *index)
 {
 	int		i;
@@ -278,7 +273,7 @@ int	calc_token_size(t_token *token, int *index)
 	i = 0;
 	pos = *index;
 	state = token->ws_mask[pos];
-	while (token->ws_mask[pos + i] == state)
+	while (token->expanded[pos + i] != '\0' && token->ws_mask[pos + i] == state)
 	{
 		i++;
 	}
@@ -286,86 +281,192 @@ int	calc_token_size(t_token *token, int *index)
 	return (i);
 }
 
-void	generate_sub_token(t_token *new, t_token *curr, int pos, t_shell *shell)
+t_token	*make_base_token(t_token *src, int start, int len, t_shell *shell)
 {
-	static int	tracker = 0;
-	int			i;
+	t_token	*new;
+	int		i;
 
+	new = safe_calloc(sizeof(t_token), shell);
 	new->type = TOKEN_WORD;
 	new->is_expanded = true;
 	new->value = NULL;
-	new->expanded = safe_calloc(pos - tracker, shell);
-	new->ws_mask = safe_calloc(pos - tracker, shell);
+	new->expanded = safe_calloc(len + 1, shell);
+	new->ws_mask = safe_calloc(len, shell);
 	i = 0;
-	while (pos > tracker)
+	while (i < len)
 	{
-		new->expanded[i] = curr->expanded[tracker];
-		new->ws_mask[i] = curr->ws_mask[tracker];
-		tracker++;
+		new->expanded[i] = src->expanded[start + i];
+		new->ws_mask[i] = src->ws_mask[start + i];
 		i++;
 	}
-	return ;
+	new->expanded[i] = '\0';
+	new->prev = NULL;
+	new->next = NULL;
+	return (new);
 }
 
-t_token	*append_token(t_token *new, t_token *curr,
-		int token_count, t_shell *shell)
+// Link new tokens in place of the old one
+void	splice_token(t_token *old, t_token *first, t_token *last,
+		t_shell *shell)
 {
-	static int	iterations = 0;
-	t_token		*newer;
+	t_token	*prev;
+	t_token	*next;
 
-	newer = safe_calloc(sizeof(t_token), shell);
-	if (iterations != token_count - 1)
-		new->next = newer;
+	prev = old->prev;
+	next = old->next;
+	if (prev)
+		prev->next = first;
 	else
-		new->next = curr->next;
-	if (iterations == 0)
-		new->prev = curr->prev;
-	else
-		newer->prev = new;
-	iterations++;
-	return (newer);
+		shell->tokens = first;
+	first->prev = prev;
+	if (next)
+		next->prev = last;
+	last->next = next;
+
+	// ! Maybe move memory management out of splicing for better modularization
+	free(old->value);
+	free(old->expanded);
+	free(old->ws_mask);
+	free(old);
 }
 
-void	generate_base_tokens(t_token *curr, int token_count, t_shell *shell)
+void	generate_base_tokens(t_token *curr, t_shell *shell)
 {
 	t_token	*new;
-	int		start;
+	t_token	*first;
+	t_token	*prev;
+	int		index;
+	int		len;
 
-	start = 0;
-	if (token_count == 1)
-		return ;
-	while (token_count-- > 0)
+	first = NULL;
+	prev = NULL;
+	index = 0;
+	while (curr->expanded[index] != '\0')
 	{
-		if (start == 0)
-			new = safe_calloc(sizeof(t_token), shell);
-		generate_sub_token(new, curr, start, shell);
-		new = append_token(new, curr, token_count, shell);
+		len = calc_token_size(curr, &index);
+		new = make_base_token(curr, index - len, len, shell);
+		if (!first)
+			first = new;
+		if (prev != NULL)
+		{
+			prev->next = new;
+			new->prev = prev;
+		}
+		prev = new;
 	}
+	splice_token(curr, first, prev, shell);
+}
+
+t_token	*make_split_token(t_token *src, int start, int len, t_shell *shell)
+{
+	t_token	*new;
+	int		i;
+
+	new = safe_calloc(sizeof(t_token), shell);
+	new->type = TOKEN_WORD;
+	new->is_expanded = true;
+	new->value = NULL;
+	new->expanded = safe_calloc(len + 1, shell);
+	new->ws_mask = NULL;
+	i = 0;
+	while (i < len)
+	{
+		new->expanded[i] = src->expanded[start + i];
+		i++;
+	}
+	new->expanded[len] = '\0';
+	return (new);
+}
+
+bool	is_ifs(char c)
+{
+	return (c == ' ' || c == '\t' || c == '\n');
+}
+
+int	next_split_length(char *str)
+{
+	int	len;
+
+	len = 0;
+	while (str[len] != '\0' && !is_ifs(str[len]))
+	{
+		len++;
+	}
+	return (len);
+}
+
+// Unfortunetaley hacky solution to save lines
+// first and prev assigned in signature
+t_token	*split_token_segments(t_token *token, t_shell *shell,
+		t_token *first, t_token *prev)
+{
+	t_token	*new;
+	int		index;
+	int		len;
+
+	index = 0;
+	while (token->expanded[index] != '\0')
+	{
+		len = next_split_length(token->expanded + index);
+		new = make_split_token(token, index, len, shell);
+		if (!first)
+			first = new;
+		if (prev)
+		{
+			prev->next = new;
+			new->prev = prev;
+		}
+
+		prev = new;
+		index += len;
+		while (token->expanded[index] != '\0' && is_ifs(token->expanded[index]))
+			index++;
+	}
+	return (first);
+}
+
+void	split_value(t_token *token, t_shell *shell)
+{
+	t_token	*first;
+	t_token	*last;
+
+	first = split_token_segments(token, shell, NULL, NULL);
+	if (!first)
+		return ;
+	last = first;
+	while (last->next)
+	{
+		last = last->next;
+	}
+	splice_token(token, first, last, shell);
 }
 
 void	word(t_shell *shell)
 {
 	t_token	*curr;
+	t_token	*next;
 
 	curr = shell->tokens;
 	while (curr != NULL)
 	{
-		if (curr->type == TOKEN_WORD && curr->is_expanded == true)
+		next = curr->next;
+		if (curr->type == TOKEN_WORD && curr->is_expanded == true
+			&& needs_splitting(curr) == true)
 		{
-			if (needs_splitting(curr) == true)
-				generate_base_tokens(curr, calc_min_tokens(curr), shell);
+			generate_base_tokens(curr, shell);
 		}
-		curr = curr->next;
+		curr = next;
 	}
 	curr = shell->tokens;
 	while (curr != NULL)
 	{
-		if (curr->type == TOKEN_WORD && curr->is_expanded == true)
+		next = curr->next;
+		if (curr->type == TOKEN_WORD && curr->is_expanded == true
+			&& needs_splitting(curr) == true)
 		{
-			if (needs_splitting(curr) == true)
-				split_value(curr);
+			split_value(curr, shell);
 		}
-		curr = curr->next;
+		curr = next;
 	}
 }
 
