@@ -175,7 +175,5 @@ size_t	exit_status_len(int i);
 int		ifs(char c);
 int		is_expandable_var(char *value, size_t index, t_quote quote_state);
 void	update_quote_state(char c, t_quote *quote_state);
-void	copy_char_expansion(t_pos *pos, t_token *token,
-		char c, t_quote *quote_state);
 
 #endif
