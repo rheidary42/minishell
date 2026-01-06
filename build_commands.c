@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:10:30 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/25 03:57:18 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/05 19:04:36 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 safe_calloc can only free "new". if its part of shell->cmds
 same in append_redir, for redirection->file and
 also refactored ft_strdup to use safe_calloc as well*/
+// ! OUTDATED COMMENT - arena allocation used throughout
 
 #include "minishell.h"
 
@@ -36,27 +37,27 @@ t_cmd	*create_append(t_shell *shell, t_token *curr_token)
 	t_cmd	*new;
 	t_cmd	*curr;
 
-	new = safe_calloc(sizeof(t_cmd), shell);
+	new = (t_cmd *)arena_push(shell->arena, sizeof(t_cmd), 0);
 	if (shell->cmds == NULL)
 	{
 		shell->cmds = new;
-		new->argv = safe_calloc((count_argc(curr_token) + 1)
-				* sizeof(char *), shell);
+		new->argv = (char **)arena_push(shell->arena, (count_argc(curr_token) + 1)
+				* sizeof(char *), 0);
 		return (new);
 	}
 	curr = shell->cmds;
 	while (curr->next != NULL)
 		curr = curr->next;
 	curr->next = new;
-	new->argv = safe_calloc((count_argc(curr_token) + 1)
-				* sizeof(char *), shell);
+	new->argv = (char **)arena_push(shell->arena, (count_argc(curr_token) + 1)
+			* sizeof(char *), 0);
 	return (new);
 }
 
 bool	is_redir(t_token *token)
 {
 	if (token->type == TOKEN_REDIR_IN || token->type == TOKEN_REDIR_OUT
-			|| token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC)
+		|| token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC)
 	{
 		return (true);
 	}
@@ -75,11 +76,14 @@ void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 	t_redir	*redirection;
 	t_redir	*curr;
 
-	redirection = safe_calloc(sizeof(t_redir), shell);
+	redirection = (t_redir *)arena_push(shell->arena, sizeof(t_redir), 0);
 	if (redirection == NULL)
 		return ; // TO DO ERROR
 	redirection->type = token->type;
-	redirection->file = ft_safe_strdup(token->next->value, shell);
+	redirection->file = (char *)arena_push(shell->arena,
+			ft_strlen(token->next->value) + 1, 0);
+	ft_strlcpy(redirection->file, token->next->value,
+		ft_strlen(token->next->value) + 1);
 	redirection->next = NULL;
 	if (cmd->redir == NULL)
 	{

@@ -91,11 +91,12 @@ t_token	*new_node(char *str, t_shell *shell)
 {
 	t_token	*new;
 
-	new = malloc(sizeof(t_token));
+	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0);
 	if (new == NULL)
 		return (NULL);
 	new -> type = token_type(str);
-	new -> value = ft_safe_strdup(str, shell);
+	new -> value = (char *)arena_push(shell->arena, ft_strlen(str) + 1, 0);
+	ft_strlcpy(new->value, str, ft_strlen(str) + 1);
 	new -> expanded = NULL;
 	new -> prev = NULL;
 	new -> next = NULL;
@@ -108,8 +109,6 @@ void	build_token_list(t_shell *shell, char **arr)
 	int		i;
 
 	i = 0;
-	// if (shell == NULL || arr == NULL)
-	// 	return ;	exit and clean?
 	while (arr[i] != NULL)
 	{
 		new = new_node(arr[i], shell);
@@ -118,7 +117,6 @@ void	build_token_list(t_shell *shell, char **arr)
 		append_node(shell, new);
 		i++;
 	}
-	free_split_arr(arr);
 }
 //TEST TOKENIZER
 void	print_cmds(t_token **tokens, t_cmd **cmds)
@@ -134,22 +132,6 @@ void	print_cmds(t_token **tokens, t_cmd **cmds)
 		printf("%i; %s", curr->redir->type, curr->redir->file);
 	}
 }
-
-// int	main(void)
-// {
-// 	t_token *tokens;
-// 	t_cmd	*cmds;
-// 	char	**arr;
-
-// 	tokens = NULL;
-// 	cmds = NULL;
-// 	arr = split("<< echo hello | wc -l >>> << outfile >>");
-// 	build_token_list(&tokens, arr);
-// 	//print_list(tokens);
-//	free_list(shell);
-// 	build_commands(&cmds, &tokens);
-// 	print_cmds(&tokens, &cmds);
-// }
 
 // int	main(void)
 // {
@@ -180,7 +162,6 @@ void	print_cmds(t_token **tokens, t_cmd **cmds)
 // 		t_redir	*r = curr->redir;
 // 		while (r != NULL)
 // 		{
-// 			printf("REDIR=%s ; ", r->file);
 // 			r = r->next;
 // 		}
 // 		curr = curr->next;

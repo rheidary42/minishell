@@ -42,15 +42,14 @@ char	**split_paths(char *paths_from_env, t_shell *shell)
 	if (paths_from_env == NULL)
 		return (NULL);
 	path_count = count_path(paths_from_env);
-	all_paths = safe_calloc(sizeof(char *) * (path_count + 1), shell);
+	all_paths = (char **)arena_push(shell->arena, sizeof(char *) * (path_count + 1), 0);
 	path_count = 0;
 	while (paths_from_env[end] != '\0')
 	{
 		if (paths_from_env[end] == ':')
 		{
-			all_paths[path_count] = ft_substr(paths_from_env, start, end - start);
-			if (all_paths[path_count] == NULL)
-				return (free_func(all_paths), NULL);
+			all_paths[path_count] = (char *)arena_push(shell->arena, end - start + 1, 0);
+			ft_strlcpy(all_paths[path_count], paths_from_env + start, end - start + 1);
 			path_count++;
 			start = end + 1;
 		}
@@ -58,9 +57,8 @@ char	**split_paths(char *paths_from_env, t_shell *shell)
 	}
 	if (end - start > 0)
 	{
-		all_paths[path_count] = ft_substr(paths_from_env, start, end);
-		if (all_paths[path_count] == NULL)
-			return (free_func(all_paths), NULL);
+		all_paths[path_count] = (char *)arena_push(shell->arena, end - start + 1, 0);
+		ft_strlcpy(all_paths[path_count], paths_from_env + start, end - start + 1);
 		path_count++;
 	}
 	all_paths[path_count] = NULL;
@@ -81,7 +79,6 @@ char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell)
 		if (access(temp, X_OK) == 0)
 			return (temp);
 		i++;
-		free(temp);
 	}
 	return (NULL);
 }

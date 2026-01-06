@@ -36,28 +36,31 @@ void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 
 	if ((envp = convert_envp(shell)) == NULL)
 	{
-		free_and_close(shell, exec, envp);
+		//free_and_close(shell, exec, envp);
 		exit(1);
 	}
 	if (is_builtin(cmd->argv[0]) == 1)
 	{
 		shell->last_exit_status = exec_builtin(cmd, envp);
-		free_and_close(shell, exec, envp);
+		//free_and_close(shell, exec, envp);
 		exit(shell->last_exit_status);
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
-		exec->final_path = ft_strdup(cmd->argv[0]);
+	{
+		exec->final_path = (char *)arena_push(shell->arena, ft_strlen(cmd->argv[0]) + 1, 0);
+		ft_strlcpy(exec->final_path, cmd->argv[0], ft_strlen(cmd->argv[0]) + 1);
+	}
 	else
 		path_lookup(cmd->argv[0], shell, exec);
 	if (exec->final_path == NULL)
 	{
 		printf("%s: command not found\n", cmd->argv[0]);
-		free_and_close(shell, exec, envp);
+		//free_and_close(shell, exec, envp);
 		exit(127);
 	}
 	execve(exec->final_path, cmd->argv, envp);
 	perror(cmd->argv[0]);
-	free_and_close(shell, exec, envp);
+	//free_and_close(shell, exec, envp);
 	exit(127);
 }
 
@@ -94,9 +97,9 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 		close(handle_heredoc(shell, cmd->redir->file));
 		return (0);
 	}
-	// if (is_builtin(cmd) == true)
-	// {
-	// 	return (exec_builtin(cmd));
-	// }
+	if (is_builtin(cmd->argv[0]) == true)
+	{
+		return (exec_builtin(cmd, convert_envp(shell)));
+	}
 	return (exec_ext_cmd(shell, cmd, exec));
 }

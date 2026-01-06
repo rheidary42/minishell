@@ -17,10 +17,11 @@ void	free_func(char **to_free)
 
 void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
-	free_func(exec->all_paths);
-	free_func(cmd->argv);
-	if (exec->final_path)
-		free(exec->final_path);
+	// No more freeing of arena-allocated memory
+	// Need Borkhuu to verify this
+	(void)shell;
+	(void)cmd;
+	// all_paths, argv, final_path are arena-allocated; no need to free them
 	if (exec->pipe_fds[0] != -1)
 	{
 		close(exec->pipe_fds[0]);
@@ -68,8 +69,8 @@ char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell)
 	int		b;
 	int		c;
 
-	str_comb = safe_calloc((ft_strlen(s1) + ft_strlen(s2)
-				+ ft_strlen(s3) + 1), shell);
+	str_comb = (char *)arena_push(shell->arena, ft_strlen(s1) + ft_strlen(s2)
+			+ ft_strlen(s3) + 1, 0);
 	a = 0;
 	b = 0;
 	c = 0;

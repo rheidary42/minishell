@@ -1,5 +1,5 @@
 {
-   <insert_a_suppression_name_here>
+   readline_reachable_leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
@@ -12,4 +12,3 @@
    fun:readline
    fun:main
 }
-

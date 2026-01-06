@@ -6,55 +6,99 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:53:58 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/12 16:13:40 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/06 17:42:40 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+// ! Handle itoa failure in all cases in better way -> potentioally remake itoa to use arena
+// ! Handle readline failure
+// ! Handle syntax errors properly -> currently exits directly
+
 void	full_exit(t_shell *shell)
 {
 	rl_clear_history();
+	free(shell->arena);
 	free_env(&shell->env);
 	free(shell->line);
 	free(shell);
 }
 
-int main(int ac, char **av, char **envp)
+t_shell	*init_shell(t_shell *shell, char **envp)
 {
-	t_shell	*shell;
-	char	*tmp_line;
+	t_mem_arena	*arena;
 
-	(void)ac; (void)av;
 	shell = ft_calloc(1, sizeof(t_shell));
 	if (shell == NULL)
-		return (EXIT_FAILURE);
+		return (NULL);
 	shell->env = ft_calloc(1, sizeof(t_env));
 	if (make_envp(shell->env, envp) == 0)
+	{
+		free(shell);
+		return (NULL);
+	}
+	arena = arena_create(64 * KIB);
+	if (arena == NULL)
+	{
+		free_env(&shell->env);
+		free(shell);
+		return (NULL);
+	}
+	shell->arena = arena;
+	shell->last_exit_status = 0;
+	shell->line = NULL;
+	shell->cmds = NULL;
+	shell->tokens = NULL;
+	return (shell);
+}
+
+char	*read_line_input(char *prev_line)
+{
+	// char	*tmp;
+	char	*line;
+
+	if (prev_line)
+	{
+		free (prev_line);
+		prev_line = NULL;
+	}
+	if (isatty(fileno(stdin)))
+	{
+		line = readline("minishell>");
+		if (line && line[0] != '\0')
+			add_history(line);
+		return (line);
+	}
+	// tmp = get_next_line(fileno(stdin));
+	// if (!tmp)
+	// 	return (NULL);
+	// line = ft_strtrim(tmp, "\n");
+	// free(tmp);
+	return (line);
+}
+
+int	main(int ac, char **av, char **envp)
+{
+	t_shell	*shell;
+
+	(void)ac; (void)av;
+	shell = init_shell(shell, envp);
+	if (shell == NULL)
 		return (EXIT_FAILURE);
 	while (true)
 	{
-		if (isatty(fileno(stdin)))
-			shell->line = readline("minishell>");
-		else
-		{
-			tmp_line = get_next_line(fileno(stdin));
-			// if (tmp_line == NULL)
-			// 	exit(32);
-			shell->line = ft_strtrim(tmp_line, "\n");
-			free(tmp_line);
-		}
-		if (shell->line == NULL)	// If EOF (CTRL-D) detected exit
+		shell->line = read_line_input(shell->line);
+		if (shell->line == NULL)    // If EOF (CTRL-D) detected exit
 		{
 			full_exit(shell);
 			exit(0);
 		}
 		parse(shell);
-		// if (shell->line[0] != '\0')	// Check for empty input to not clog history with empty lines
-		// 	add_history(shell->line);
 		execution(shell);
-		clean_up(shell);
-		// free
+		arena_clear(shell->arena);
+		shell->cmds = NULL;
+		shell->tokens = NULL;
 	}
 	full_exit(shell);
 	return (0);

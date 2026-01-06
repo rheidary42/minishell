@@ -71,7 +71,6 @@ int	handle_heredoc(t_shell *shell, char *delim)
 	// }
 	fd = open(tmp_file, O_RDONLY);
 	unlink(tmp_file);
-	free(tmp_file);
 	return (fd);
 }
 

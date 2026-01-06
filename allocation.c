@@ -6,27 +6,11 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:57:48 by rheidary          #+#    #+#             */
-/*   Updated: 2025/12/13 18:06:52 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/06 18:02:09 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-// TO-DO Add actual exit-code to exit()
-void	*safe_calloc(size_t size, t_shell *shell)
-{
-	void	*ptr;
-
-	if (size == 0)
-		return (NULL);
-	ptr = ft_calloc(1, size);
-	if (!ptr)
-	{
-		clean_up(shell);
-		exit(0);
-	}
-	return (ptr);
-}
 
 // TO-DO pre-set all values to NULL so if conditions work properly
 void	free_env(t_env **env)
@@ -47,6 +31,7 @@ void	free_env(t_env **env)
 		free(curr);
 		curr = tmp;
 	}
+//	free(env);
 	*env = NULL;
 }
 

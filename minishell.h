@@ -40,11 +40,34 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+/* Arena headers */
+# include <stdint.h>
+
+typedef int8_t		t_i8;
+typedef int16_t		t_i16;
+typedef int32_t		t_i32;
+typedef int64_t		t_i64;
+typedef uint8_t		t_u8;
+typedef uint16_t	t_u16;
+typedef uint32_t	t_u32;
+typedef uint64_t	t_u64;
+
+typedef t_i8		t_b8;
+typedef t_i32		t_b32;
+
+# define KIB 1024 
+
+typedef struct s_struct
+{
+	 t_u64	capacity;
+	 t_u64	pos;
+}	 t_mem_arena;
+
 extern volatile sig_atomic_t	g_sig;
 
 typedef struct s_pos
 {
-	size_t	val;
+	size_t	org;
 	size_t	exp;
 }	t_pos;
 
@@ -109,6 +132,7 @@ typedef struct s_shell
     t_env   *env;
     char    *line;
     int     last_exit_status;
+    t_mem_arena *arena;
 }   t_shell;
 
 typedef struct  s_exec
@@ -134,14 +158,20 @@ t_token	*tokenize(t_shell *shell);
 int	    token_len(char *str);
 void	build_commands(t_shell *shell);
 
+        // ARENA ALLOCATOR
+t_mem_arena	*arena_create(t_u64 capacity);
+void		*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero);
+void		arena_pop(t_mem_arena *arena, t_u64 size);
+void		arena_pop_to(t_mem_arena *arena, t_u64 pos);
+void		arena_clear(t_mem_arena *arena);
+
         //ALLOCATION
-void	*safe_calloc(size_t size, t_shell *shell);
 void	clean_up(t_shell *shell);
 void	free_env(t_env **env);
 
         //HELPERS
-char	*ft_safe_strdup(const char *s, t_shell *shell);
 char	*ft_strcpy(char *dest, char *src);
+char	*read_line_input(char *prev_line);
 
         //EXECUTION HELPERS
 int     is_builtin(char *cmd);
@@ -168,12 +198,44 @@ char	**convert_envp(t_shell *shell);
 int	free_env_list(t_env *head);
 int	handle_heredoc(t_shell *shell, char *delim);
 
+// Placeholder for built-in execution function
+int	exec_builtin(t_cmd *cmd, char **envp);
+int	ft_echo(t_cmd *cmd);
 
-// EXPANSIONS // WILL FORMAT EVENTUALLY
-void	parameter(t_shell *shell);
+/* ===========================
+** Expansion functions
+** =========================== */
+
+/* param_helper.c */
 size_t	exit_status_len(int i);
 int		ifs(char c);
 int		is_expandable_var(char *value, size_t index, t_quote quote_state);
 void	update_quote_state(char c, t_quote *quote_state);
+
+/* expansion_var.c */
+size_t	get_var_len(char *value, int *var_start, t_shell *shell);
+char	*get_var_name(t_shell *shell, char *value, size_t *var_start);
+char	*get_var_value(char *var_name, t_shell *shell);
+
+/* expansion_size.c */
+int		needs_expansions(t_token *token);
+size_t	calc_expanded_size(char *value, t_shell *shell);
+
+/* expansion_insert.c */
+void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell, t_quote *quote_state);
+void	handle_var(t_pos *pos, t_quote *quote_state, t_token *token, t_shell *shell);
+
+/* expansion_core.c */
+void	expand_value(t_token *token, t_shell *shell, size_t len);
+void	parameter(t_shell *shell);
+
+/* ===========================
+** Word splitting functions
+** =========================== */
+
+/* word.c */
+bool	needs_splitting(t_token *curr);
+void	word(t_shell *shell);
+void	split_value(t_token *token, t_shell *shell);
 
 #endif

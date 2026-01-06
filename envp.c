@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:03:06 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/12 16:25:04 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/05 16:15:48 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int	make_envp(t_env *copy_env, char **curr_env)
 	int		i;
 
 	i = 0;
-	if (!curr_env || !curr_env[0])
+	if (!copy_env ||!curr_env || !curr_env[0])
 		return (EXIT_FAILURE);
 	curr_node = copy_env;
 	while (curr_env[i] != NULL)

@@ -22,7 +22,7 @@ char	**convert_envp(t_shell *shell)
 
 	curr_env = shell->env;
 	list_size = env_list_size(curr_env);
-	env = safe_calloc(sizeof(char *) * (list_size + 1), shell);
+	env = (char **)arena_push(shell->arena, sizeof(char *) * (list_size + 1), 0);
 	i = 0;
 	while (curr_env != NULL)
 	{

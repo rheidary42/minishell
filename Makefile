@@ -12,7 +12,7 @@ BOLD	:= \033[1m
 
 NAME := minishell
 HEADER := minishell.h
-CFLAGS := -g -I. -lreadline -g3
+CFLAGS := -g3 -I.
 # -Wall -Wextra -Werror
 
 LIBFT := libs/libft/libft.a
@@ -32,24 +32,45 @@ SRCS =	main.c\
 		exec_single_command.c\
 		execution.c\
 		helper1.c\
+		builtins.c\
 		heredoc.c\
 		param_helper.c\
 		signals.c\
 		validate_tokens.c\
-		expansion.c\
-		$(GNL_SRCS)\
+		arena.c\
+		echo.c\
+		src/expansion/parameter/expansion_core.c\
+		src/expansion/parameter/expansion_insert.c\
+		src/expansion/parameter/expansion_size.c\
+		src/expansion/parameter/expansion_var.c\
+		src/expansion/word.c
+# 		$(GNL_SRCS)\
 
 OBJS := $(SRCS:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS)
-	cc $(CFLAGS) $(OBJS) $(LIBFT) -o $(NAME)
+	cc $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
 
 # --- libraries ---
 
 $(LIBFT):
 	@make -sC libs/libft
+
+# --- test target ---
+
+TEST_NAME := expansion_test
+TEST_SRC := tests/expansion_tester.c
+
+test: $(LIBFT)
+	cc -g \
+		$(filter-out main.o, $(OBJS)) \
+		$(TEST_SRC) \
+		$(LIBFT) \
+		-I. \
+		-lreadline \
+		-o $(TEST_NAME)
 
 # --- cleaning ---
 
@@ -60,6 +81,7 @@ clean:
 fclean:
 	@rm -f $(OBJS)
 	@rm -f $(NAME)
+	@rm -f $(TEST_NAME)
 	@make clean -sC libs/libft
 	@make fclean -sC libs/libft
 
