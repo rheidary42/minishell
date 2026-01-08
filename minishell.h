@@ -3,7 +3,7 @@
 
 /* External libraries*/
 # include "libs/libft/libft.h"
-//# include "libs/get_next_line/get_next_line.h"
+# include "libs/get_next_line/get_next_line.h"
 
 /* Standard library + memory + strings */
 # include <stdlib.h>
