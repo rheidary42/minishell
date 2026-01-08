@@ -55,7 +55,7 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 
 char	*read_line_input(char *prev_line)
 {
-	// char	*tmp;
+	char	*tmp;
 	char	*line;
 
 	if (prev_line)
@@ -70,11 +70,11 @@ char	*read_line_input(char *prev_line)
 			add_history(line);
 		return (line);
 	}
-	// tmp = get_next_line(fileno(stdin));
-	// if (!tmp)
-	// 	return (NULL);
-	// line = ft_strtrim(tmp, "\n");
-	// free(tmp);
+	tmp = get_next_line(fileno(stdin));
+	if (!tmp)
+		return (NULL);
+	line = ft_strtrim(tmp, "\n");
+	free(tmp);
 	return (line);
 }
 

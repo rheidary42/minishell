@@ -238,4 +238,7 @@ bool	needs_splitting(t_token *curr);
 void	word(t_shell *shell);
 void	split_value(t_token *token, t_shell *shell);
 
+// FIX LATER
+bool	is_ifs(char c);
+
 #endif

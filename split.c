@@ -30,7 +30,7 @@ int	is_delim(char *str)
 {
 	if ((str[0] == '<' && str[1] == '<') || (str[0] == '>' && str[1] == '>'))
 		return (2);
-	if (str[0] == '<' || str[0] == '>' || str[0] == '|' || str[0] == ' ')
+	if (str[0] == '<' || str[0] == '>' || str[0] == '|' || is_ifs(str[0]))
 		return (1);
 	return (0);
 }
@@ -64,7 +64,7 @@ int	count_tokens(char *str)
 	count = 0;
 	while (str[i])
 	{
-		while (str[i] == ' ')
+		while (is_ifs(str[i]))
 			i++;
 		if (!str[i])
 			break ;
@@ -109,7 +109,7 @@ char	**split(t_shell *shell)
 		return (NULL);
 	while (i < tokens)
 	{
-		while (shell->line[j] == ' ')
+		while (is_ifs(shell->line[j]))
 			j++;
 		len = token_len(&(shell->line[j]));
 		arr[i] = (char *)arena_push(shell->arena, len + 1, 0);
@@ -125,12 +125,12 @@ char	**split(t_shell *shell)
 
 // int	main(void)
 // {
-// 	char	**str = split("<< echo \" I am one token hello\" | wc -l >> << outfile >>");
+// 	t_shell *idk = calloc(sizeof(t_shell), 1);
+// 	idk->arena = arena_create(1000);
+// 	idk->line = "echo -n test1\t\ttest2";
+// 	char	**str = split(idk);
 
 // 	for (int i = 0; str[i]; i++)
 // 		printf("[%s]\n", str[i]);
-// 	for (int i = 0; str[i]; i++)
-// 		free(str[i]);
-// 	free(str);
 // 	return (0);
 // }

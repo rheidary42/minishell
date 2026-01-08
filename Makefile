@@ -43,8 +43,8 @@ SRCS =	main.c\
 		src/expansion/parameter/expansion_insert.c\
 		src/expansion/parameter/expansion_size.c\
 		src/expansion/parameter/expansion_var.c\
-		src/expansion/word.c
-# 		$(GNL_SRCS)\
+		src/expansion/word.c\
+ 		$(GNL_SRCS)\
 
 OBJS := $(SRCS:.c=.o)
 
