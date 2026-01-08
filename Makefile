@@ -38,7 +38,9 @@ SRCS =	main.c\
 		signals.c\
 		validate_tokens.c\
 		arena.c\
-		echo.c\
+		builtins/echo.c\
+		builtins/pwd.c\
+		builtins/unset.c\
 		src/expansion/parameter/expansion_core.c\
 		src/expansion/parameter/expansion_insert.c\
 		src/expansion/parameter/expansion_size.c\

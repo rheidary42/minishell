@@ -201,6 +201,7 @@ int	handle_heredoc(t_shell *shell, char *delim);
 // Placeholder for built-in execution function
 int	exec_builtin(t_cmd *cmd, char **envp);
 int	ft_echo(t_cmd *cmd);
+bool	is_flag(char *str);
 
 /* ===========================
 ** Expansion functions

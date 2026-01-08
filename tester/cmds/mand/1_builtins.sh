@@ -150,6 +150,7 @@ echo -n -n test1
 echo -n -n -n -n -n test1
 
 echo -
+
 echo --
 
 echo "  -nn "
