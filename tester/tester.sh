@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change if you store the tester in another PATH
-export MINISHELL_PATH=/home/boenkhja/arena_minishell
+export MINISHELL_PATH="$(cd .. && pwd)"
 export EXECUTABLE=minishell
 RUNDIR=$(pwd)
 
