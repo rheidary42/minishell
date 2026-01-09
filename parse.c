@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 12:23:09 by rheidary          #+#    #+#             */
-/*   Updated: 2025/11/18 15:20:28 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/09 16:08:20 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ void	parse(t_shell *shell)
 {
 	tokenize(shell);
 	parameter(shell);
+	word(shell);
+	quote_removal(shell);
 	build_commands(shell);
 	// while (state == in_quote)
 	// {

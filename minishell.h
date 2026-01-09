@@ -239,6 +239,15 @@ bool	needs_splitting(t_token *curr);
 void	word(t_shell *shell);
 void	split_value(t_token *token, t_shell *shell);
 
+/* ===========================
+** Quote removal functions
+** =========================== */
+
+/* quote.c */
+bool	needs_removal(t_token *token, t_shell *shell);
+char	*remove_quotes(char *value, t_shell *shell);
+void	quote_removal(t_shell *shell);
+
 // FIX LATER
 bool	is_ifs(char c);
 

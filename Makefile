@@ -46,6 +46,7 @@ SRCS =	main.c\
 		src/expansion/parameter/expansion_size.c\
 		src/expansion/parameter/expansion_var.c\
 		src/expansion/word.c\
+		src/expansion/quote.c\
  		$(GNL_SRCS)\
 
 OBJS := $(SRCS:.c=.o)
