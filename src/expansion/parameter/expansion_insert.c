@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/05 19:22:19 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/05 19:22:55 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/09 23:18:18 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell,
 	i = -1;
 	while (++i < exit_len)
 	{
-		if (*quote_state == DOUBLE_QUOTE)
-			token->ws_mask[pos->exp + i] = true;
 		token->expanded[pos->exp + i] = exit_status[i];
 	}
 	pos->exp += exit_len;

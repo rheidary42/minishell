@@ -92,7 +92,9 @@ int	main(void)
 	test_add_env(&shell, test_new_env("NEWLINE", "x\ny\nz", &shell));
 	test_add_env(&shell, test_new_env("MIXED", " a\tb \nc ", &shell));
 	test_add_env(&shell, test_new_env("PATH", "/usr/bin:/bin", &shell));
+	test_add_env(&shell, test_new_env("USER", "hi", &shell));
 
+	tokens[i++] = test_new_token("echo ''''$USER''''", &shell);
 	tokens[i++] = test_new_token("$VAR", &shell);              // Basic: one two three
 	tokens[i++] = test_new_token("$SINGLE", &shell);           // Single word: word
 	tokens[i++] = test_new_token("$EMPTY", &shell);            // Empty expansion
