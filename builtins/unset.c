@@ -51,16 +51,3 @@ int	ft_unset(t_env *env, t_cmd *cmd)
 	}
 	return (0);
 }
-
-int	ft_env(char **env)
-{
-	int	i;
-
-	while (env && env[i])
-	{
-		write(STDOUT_FILENO, env[i], ft_strlen(env[i]));
-		write(STDOUT_FILENO, "\n", 1);
-		i++;
-	}
-	return (0);
-}

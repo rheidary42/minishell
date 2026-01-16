@@ -89,6 +89,17 @@ typedef enum e_toktype
     TOKEN_EOF          // end of input
 }   t_toktype;
 
+typedef enum e_builtins
+{
+    EECHO,          //EECHO because ECHO already exists
+    CD,
+    PWD,
+    EXPORT,
+    UNSET,
+    ENV,
+    EXIT,
+}   t_builtins;
+
 typedef struct s_token
 {
     t_toktype       type;
@@ -186,12 +197,13 @@ char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell);
 void	path_lookup(char *cmd_name, t_shell *shell, t_exec *exec);
 void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void	free_func(char **to_free);
+int	consume_redirs_only(t_shell *shell, t_redir *redir);
         //EXECUTION
 
 int	execution(t_shell *shell);
-int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec);
+int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	exec_single_cmd(t_shell *shell, t_exec *exec);
-void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
+void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	build_pipeline(t_shell *shell, t_exec *exec);
 int	make_envp(t_env *copy_env, char **curr_env);
 char	**convert_envp(t_shell *shell);
@@ -199,8 +211,11 @@ int	free_env_list(t_env *head);
 int	handle_heredoc(t_shell *shell, char *delim);
 
 // Placeholder for built-in execution function
-int	exec_builtin(t_cmd *cmd, char **envp);
+int	exec_builtin(t_cmd *cmd, char **envp, t_env *env, int builtin_id);
 int	ft_echo(t_cmd *cmd);
+int	ft_env(char **env);
+int	ft_pwd(void);
+int	ft_unset(t_env *env, t_cmd *cmd);
 bool	is_flag(char *str);
 
 /* ===========================

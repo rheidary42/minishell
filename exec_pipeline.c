@@ -42,8 +42,7 @@ void	exec_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		close(exec->pipe_fds[0]);
 		close(exec->pipe_fds[1]);
 	}
-	apply_redir(shell, cmd, cmd->redir, exec);
-	exec_in_child(shell, cmd, exec);
+	exec_in_child_helper(shell, cmd, exec);
 }
 
 int	build_pipeline(t_shell *shell, t_exec *exec)

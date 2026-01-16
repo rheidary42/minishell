@@ -1,5 +1,33 @@
 #include "minishell.h"
 
+int	consume_redirs_only(t_shell *shell, t_redir *redir)
+{
+	int	fd;
+
+	while (redir)
+	{
+		if (redir->type == TOKEN_HEREDOC)
+		{
+			fd = handle_heredoc(shell, redir->file);
+			if (fd >= 0)
+				close(fd);
+		}
+		else if (redir->type == TOKEN_REDIR_IN)
+			fd = open(redir->file, O_RDONLY);
+		else if (redir->type == TOKEN_REDIR_OUT)
+			fd = open(redir->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else if (redir->type == TOKEN_APPEND)
+			fd = open(redir->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd == -1)
+		{
+			perror(redir->file);
+			return (-1);
+		}
+		redir = redir->next;
+	}
+	return (0);
+}
+
 void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 {
 	t_redir	*r;
@@ -30,18 +58,20 @@ void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 	}
 }
 
-void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
+void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
 	char	**envp;
+	int		builtin_id;
 
+	apply_redir(shell, cmd, cmd->redir, exec);
 	if ((envp = convert_envp(shell)) == NULL)
 	{
 		//free_and_close(shell, exec, envp);
 		exit(1);
 	}
-	if (is_builtin(cmd->argv[0]) == 1)
+	if ((builtin_id = is_builtin(cmd->argv[0])) >= 0)
 	{
-		shell->last_exit_status = exec_builtin(cmd, envp);
+		shell->last_exit_status = exec_builtin(cmd, envp, shell->env, builtin_id);
 		//free_and_close(shell, exec, envp);
 		exit(shell->last_exit_status);
 	}
@@ -64,7 +94,7 @@ void	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	exit(127);
 }
 
-int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
+int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
 	int	status;
 
@@ -77,7 +107,7 @@ int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if (exec->child == 0)
 	{
-		exec_in_child(shell, cmd, exec);
+		exec_in_child_helper(shell, cmd, exec);
 	}
 	waitpid(exec->child, &status, 0);
 	if (WIFEXITED(status) != 0)
@@ -90,16 +120,26 @@ int	exec_ext_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 int	exec_single_cmd(t_shell *shell, t_exec *exec)
 {
 	t_cmd	*cmd;
+	int		builtin_id;
 
 	cmd = shell->cmds;
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 	{
-		close(handle_heredoc(shell, cmd->redir->file));
-		return (0);
+		if (cmd->redir != NULL)
+		{
+			if (consume_redirs_only(shell, cmd->redir) == -1)
+				shell->last_exit_status = 1;
+			else
+				shell->last_exit_status = 0;
+		}
+		return (shell->last_exit_status);
 	}
-	if (is_builtin(cmd->argv[0]) == true)
+	builtin_id = is_builtin(cmd->argv[0]);
+	if (builtin_id >= 0 && cmd->redir == NULL)
 	{
-		return (exec_builtin(cmd, convert_envp(shell)));
+		shell->last_exit_status = exec_builtin(cmd, convert_envp(shell),
+							shell->env, builtin_id);
+			return (shell->last_exit_status);
 	}
-	return (exec_ext_cmd(shell, cmd, exec));
+	return (exec_in_child(shell, cmd, exec));
 }

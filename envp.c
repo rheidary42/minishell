@@ -91,5 +91,5 @@ int	make_envp(t_env *copy_env, char **curr_env)
 	}
 	if (curr_node != NULL)
 		curr_node->next = NULL;
-	return (1);
+	return (0);
 }

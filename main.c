@@ -33,7 +33,7 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 	if (shell == NULL)
 		return (NULL);
 	shell->env = ft_calloc(1, sizeof(t_env));
-	if (make_envp(shell->env, envp) == 0)
+	if (make_envp(shell->env, envp) == 1)
 	{
 		free(shell);
 		return (NULL);

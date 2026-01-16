@@ -40,7 +40,7 @@ void	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 	while (1)
 	{
 		g_sig = 0;
-		line = readline("heredoc> ");
+		line = readline("> ");
 		if (g_sig == SIGINT)
 			clean_heredoc(tmp_file);
 		if (line == NULL || ft_strcmp(line, delim) == 0)
@@ -61,14 +61,6 @@ int	handle_heredoc(t_shell *shell, char *delim)
 
 	tmp_file = get_here_doc_name(shell);
 	run_heredoc(shell, tmp_file, delim);
-	// waitpid(child, &status, 0);
-	// if (WIFSIGNALED(status) != 0 && WTERMSIG(status) == SIGINT)
-	// {
-	// 	shell->last_exit_status = 130;
-	// 	unlink(tmp_file);
-	// 	free(tmp_file);
-	// 	return (-1);
-	// }
 	fd = open(tmp_file, O_RDONLY);
 	unlink(tmp_file);
 	return (fd);
