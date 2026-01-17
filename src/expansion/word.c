@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/26 17:32:51 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/06 16:16:04 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/01/17 14:46:46 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,7 @@ int	calc_token_size(t_token *token, int *index)
 		i++;
 	}
 	if ((pos + i > 0 && token->expanded[pos + i] != '\0')
-		&& is_ifs(token->expanded[pos + i]) == true
-		&& is_ifs(token->expanded[pos + i - 1]) == false)
+		&& is_ifs(token->expanded[pos + i]) == false)
 	{
 		while (token->expanded[pos + i] != '\0'
 			&& is_ifs(token->expanded[pos + i]) == false)
