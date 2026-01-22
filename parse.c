@@ -19,12 +19,15 @@ t_token	*tokenize(t_shell *shell)
 	if (shell->line[0] == '\0')
 		return (NULL);
 	arr = split(shell);
+	if (arr[0] == NULL)
+		return (NULL);
 	build_token_list(shell, arr);
 	// clean arguments
 	if (!validate_tokens(shell->tokens))
 	{
-		//cleanup
-		exit(1);
+		write(STDERR_FILENO, "minishell: syntax error\n", 25);
+		shell->last_exit_status = 2;
+		return (NULL);
 	}
 	return (NULL);
 }
