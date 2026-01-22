@@ -7,7 +7,8 @@ int	env_list_size(t_env *env)
 	i = 0;
 	while (env != NULL)
 	{
-		i++;
+		if (env->exported == true)
+			i++;
 		env = env->next;
 	}
 	return (i);
@@ -26,8 +27,11 @@ char	**convert_envp(t_shell *shell)
 	i = 0;
 	while (curr_env != NULL)
 	{
-		env[i] = str_join3(curr_env->name, "=", curr_env->value, shell);
-		i++;
+		if (curr_env->exported == true)
+		{
+			env[i] = str_join3(curr_env->name, "=", curr_env->value, shell);
+			i++;
+		}
 		curr_env = curr_env->next;
 	}
 	env[i] = NULL;

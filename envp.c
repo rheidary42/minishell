@@ -33,6 +33,7 @@ int	copy_var(t_env *env, char *str)
 	{
 		env->name = ft_strdup(str);
 		env->value = ft_strdup("");
+		env->exported = true;
 		if (!env->name || !env->value)
 			return (0);
 		return (1);
@@ -43,12 +44,10 @@ int	copy_var(t_env *env, char *str)
 		return (0);
 	env->value = ft_calloc(1, value_len + 1);
 	if (env->value == NULL)
-	{
-		free(env->name);
-		return (0);
-	}
+		return (free(env->name), 0);
 	ft_strlcpy(env->name, str, name_len + 1);
 	ft_strlcpy(env->value, str + name_len + 1, value_len + 1);
+	env->exported = true;
 	return (1);
 }
 

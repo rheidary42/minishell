@@ -124,6 +124,7 @@ typedef struct  s_env
 {
     char    		*name;
     char    		*value;
+    bool            exported;
     struct s_env	*next;
 }   t_env;
 
@@ -168,7 +169,7 @@ void	parse(t_shell *shell);
 t_token	*tokenize(t_shell *shell);
 int	    token_len(char *str);
 void	build_commands(t_shell *shell);
-
+int	copy_var(t_env *env, char *str);
         // ARENA ALLOCATOR
 t_mem_arena	*arena_create(t_u64 capacity);
 void		*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero);
@@ -184,7 +185,7 @@ void	free_env(t_env **env);
 char	*ft_strcpy(char *dest, char *src);
 char	*read_line_input(char *prev_line);
 
-        //EXECUTION HELPERS
+       //EXECUTION HELPERS
 int     is_builtin(char *cmd);
 char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell);
 bool	is_direct_path(char *executable);
@@ -216,6 +217,7 @@ int	ft_echo(t_cmd *cmd);
 int	ft_env(char **env);
 int	ft_pwd(void);
 int	ft_unset(t_env *env, t_cmd *cmd);
+int	ft_export(t_env	*env, t_cmd *cmd);
 bool	is_flag(char *str);
 
 /* ===========================
