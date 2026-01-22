@@ -10,8 +10,8 @@ int	exec_builtin(t_cmd *cmd, char **envp, t_env *env, int builtin_id)
 	// 	return (ft_cd(cmd));
 	if (builtin_id == PWD)
 		return (ft_pwd());
-	// if (builtin_id == EXPORT)
-	// 	return (ft_export(cmd));
+	if (builtin_id == EXPORT)
+		return (ft_export(env, cmd));
 	if (builtin_id == UNSET)
 		return (ft_unset(env, cmd));
 	if (builtin_id == ENV)
