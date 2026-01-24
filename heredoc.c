@@ -25,6 +25,7 @@ void	clean_heredoc(char *tmp_file)
 void	sig_handler(int sig)
 {
 	g_sig = sig;
+	//if you need a new line, you can use rl_hook to hook in a function where you use ioctl to insert a new line
 }
 
 void	run_heredoc(t_shell *shell, char *tmp_file, char *delim)

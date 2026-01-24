@@ -71,7 +71,7 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if ((builtin_id = is_builtin(cmd->argv[0])) >= 0)
 	{
-		shell->last_exit_status = exec_builtin(cmd, envp, shell->env, builtin_id);
+		shell->last_exit_status = exec_builtin(shell, cmd, envp, shell->env, builtin_id);
 		//free_and_close(shell, exec, envp);
 		exit(shell->last_exit_status);
 	}
@@ -84,7 +84,8 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		path_lookup(cmd->argv[0], shell, exec);
 	if (exec->final_path == NULL)
 	{
-		printf("%s: command not found\n", cmd->argv[0]);
+		perror(cmd->argv[0]);
+		//printf("%s: command not found\n", cmd->argv[0]);
 		//free_and_close(shell, exec, envp);
 		exit(127);
 	}
@@ -137,7 +138,7 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 	builtin_id = is_builtin(cmd->argv[0]);
 	if (builtin_id >= 0 && cmd->redir == NULL)
 	{
-		shell->last_exit_status = exec_builtin(cmd, convert_envp(shell),
+		shell->last_exit_status = exec_builtin(shell, cmd, convert_envp(shell),
 							shell->env, builtin_id);
 			return (shell->last_exit_status);
 	}

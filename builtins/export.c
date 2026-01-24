@@ -39,7 +39,7 @@ void	just_export(t_env *env)
 	}	
 }
 
-t_env *new_var(t_env *env, char *var)
+int	new_var(t_env *env, char *var)
 {
     t_env *new_node;
     t_env *tmp;
@@ -47,15 +47,13 @@ t_env *new_var(t_env *env, char *var)
 	tmp = env;
 	new_node = ft_calloc(1, sizeof(t_env));
     if (new_node == NULL)
-        return (free_env_list(env), NULL);
+        return (1);
     if (copy_var(new_node, var) == 0)
-        return (free_env_list(env), NULL);
-    if (env == NULL)
-        return (new_node);
+        return (1);
     while (tmp->next != NULL)
         tmp = tmp->next;
     tmp->next = new_node;
-    return (env);
+    return (0);
 }
 
 
@@ -75,14 +73,14 @@ int	process_var(t_env *env, char *var)
 		curr = curr->next;	
 	}
 	if (curr == NULL)
-		return (new_var(env, var), 0);
+		return (new_var(env, var));
 	curr->exported = true;
 	if (var[id_len] != '\0')
 	{
 		free(curr->value);
 		curr->value = ft_calloc(ft_strlen(var) - id_len + 1, sizeof(char));
 		if (curr->value == NULL)
-			return (free_env_list(env));
+			return (1);
 		ft_strlcpy(curr->value, var + id_len + 1, ft_strlen(var) - id_len + 1);
 	}
 	return (0);
@@ -105,7 +103,8 @@ int	ft_export(t_env	*env, t_cmd *cmd)
 			i++;
 			continue;
 		}
-		process_var(env, cmd->argv[i]);
+		if (process_var(env, cmd->argv[i]) == 1)
+			return (free_env_list(env), 2);
 		i++;
 	}
 	return (0);

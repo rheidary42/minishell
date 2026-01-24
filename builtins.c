@@ -2,7 +2,7 @@
 
 // Minimal stub for builtins to allow linking during development.
 // Replace with real builtin implementations later.
-int	exec_builtin(t_cmd *cmd, char **envp, t_env *env, int builtin_id)
+int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id)
 {
 	if (builtin_id == EECHO)
 		return (ft_echo(cmd));
@@ -16,8 +16,7 @@ int	exec_builtin(t_cmd *cmd, char **envp, t_env *env, int builtin_id)
 		return (ft_unset(env, cmd));
 	if (builtin_id == ENV)
 		return (ft_env(envp));
-	// if (builtin_id == EXIT)
-	// 	return (ft_exit(cmd));
-	// Return 0 to indicate success by default.
+	if (builtin_id == EXIT)
+		return (ft_exit(shell, cmd, env));
 	return (0);
 }

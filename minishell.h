@@ -212,12 +212,13 @@ int	free_env_list(t_env *head);
 int	handle_heredoc(t_shell *shell, char *delim);
 
 // Placeholder for built-in execution function
-int	exec_builtin(t_cmd *cmd, char **envp, t_env *env, int builtin_id);
+int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id);
 int	ft_echo(t_cmd *cmd);
 int	ft_env(char **env);
 int	ft_pwd(void);
 int	ft_unset(t_env *env, t_cmd *cmd);
 int	ft_export(t_env	*env, t_cmd *cmd);
+int	ft_exit(t_shell *shell, t_cmd *cmd, t_env *env);
 bool	is_flag(char *str);
 
 /* ===========================

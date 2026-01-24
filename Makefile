@@ -43,6 +43,7 @@ SRCS =	main.c\
 		builtins/unset.c\
 		builtins/env.c\
 		builtins/export.c\
+		builtins/exit.c\
 		src/expansion/parameter/expansion_core.c\
 		src/expansion/parameter/expansion_insert.c\
 		src/expansion/parameter/expansion_size.c\
