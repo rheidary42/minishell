@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:03:06 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/05 16:15:48 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/03 12:09:11 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	copy_var(t_env *env, char *str)
 	size_t	value_len;
 
 	name_len = strlen_delim(str, '=');
-	if (str[name_len] == '\0')		//no "=" found, 
+	if (str[name_len] == '\0')		//no "=" found
 	{
 		env->name = ft_strdup(str);
 		env->value = ft_strdup("");
@@ -66,15 +66,25 @@ int	free_env_list(t_env *head)
 	return (0);
 }
 
-int	make_envp(t_env *copy_env, char **curr_env)
+// ! TODO: MAKE ENV (3 THINGS IDK) 
+// ! IN CASE OF ENV -I ./MINISHELL START UP LEADING TO NO ENV
+// int	make_envp(t_env *copy_env)
+// {
+	
+// 	return (0);
+// }
+
+int	copy_envp(t_env *copy_env, char **curr_env)
 {
 	t_env	*curr_node;
 	t_env	*new_node;
 	int		i;
 
 	i = 0;
-	if (!copy_env ||!curr_env || !curr_env[0])
+	if (!copy_env)
 		return (EXIT_FAILURE);
+	// if (!curr_env)
+	// 	return (make_envp(copy_env));
 	curr_node = copy_env;
 	while (curr_env[i] != NULL)
 	{

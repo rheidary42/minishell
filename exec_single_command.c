@@ -77,7 +77,7 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
 	{
-		exec->final_path = (char *)arena_push(shell->arena, ft_strlen(cmd->argv[0]) + 1, 0);
+		exec->final_path = (char *)arena_push(shell->arena, ft_strlen(cmd->argv[0]) + 1, 0, shell);
 		ft_strlcpy(exec->final_path, cmd->argv[0], ft_strlen(cmd->argv[0]) + 1);
 	}
 	else

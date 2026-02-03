@@ -80,7 +80,7 @@ t_toktype	token_type(char *str)
 		return (TOKEN_HEREDOC);
 	else if (str[0] == '>')
 		return (TOKEN_REDIR_OUT);
-	else if(str[0] == '<')
+	else if (str[0] == '<')
 		return (TOKEN_REDIR_IN);
 	else if (str[0] == '|')
 		return (TOKEN_PIPE);
@@ -91,15 +91,15 @@ t_token	*new_node(char *str, t_shell *shell)
 {
 	t_token	*new;
 
-	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0);
+	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0, shell);
 	if (new == NULL)
 		return (NULL);
-	new -> type = token_type(str);
-	new -> value = (char *)arena_push(shell->arena, ft_strlen(str) + 1, 0);
+	new->type = token_type(str);
+	new->value = (char *)arena_push(shell->arena, ft_strlen(str) + 1, 0, shell);
 	ft_strlcpy(new->value, str, ft_strlen(str) + 1);
-	new -> expanded = NULL;
-	new -> prev = NULL;
-	new -> next = NULL;
+	new->expanded = NULL;
+	new->prev = NULL;
+	new->next = NULL;
 	return (new);
 }
 

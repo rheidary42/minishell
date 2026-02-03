@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 16:43:26 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/05 16:48:23 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/02 19:58:01 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ char	**split(t_shell *shell)
 	i = 0;
 	j = 0;
 	tokens = count_tokens(shell->line);
-	arr = (char **)arena_push(shell->arena, sizeof(char *) * (tokens + 1), 0);
+	arr = (char **)arena_push(shell->arena, 8 * (tokens + 1), 0, shell);
 	if (!arr)
 		return (NULL);
 	while (i < tokens)
@@ -112,7 +112,7 @@ char	**split(t_shell *shell)
 		while (is_ifs(shell->line[j]))
 			j++;
 		len = token_len(&(shell->line[j]));
-		arr[i] = (char *)arena_push(shell->arena, len + 1, 0);
+		arr[i] = (char *)arena_push(shell->arena, len + 1, 0, shell);
 		if (!arr[i])
 			return (NULL);
 		ft_strlcpy(arr[i], &(shell->line[j]), len + 1);

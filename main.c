@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:53:58 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/06 17:42:40 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/03 11:58:31 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,15 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 	if (shell == NULL)
 		return (NULL);
 	shell->env = ft_calloc(1, sizeof(t_env));
-	if (make_envp(shell->env, envp) == 1)
+	if (copy_envp(shell->env, envp) == 1)
 	{
 		free(shell);
 		return (NULL);
 	}
-	arena = arena_create(64 * KIB);
+	arena = arena_create(67 * KIB);
 	if (arena == NULL)
 	{
+		perror("Arena alloaction failed\n");
 		free_env(&shell->env);
 		free(shell);
 		return (NULL);

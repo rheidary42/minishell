@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/05 16:08:31 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/05 16:08:37 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:28:41 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ t_mem_arena	*arena_create(t_u64 capacity)
 	return (arena);
 }
 
-
-void	*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero)
+void	*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero,
+	t_shell *shell)
 {
 	t_u64	pos_aligned;
 	t_u64	new_pos;
@@ -38,7 +38,9 @@ void	*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero)
 	new_pos = pos_aligned + size;
 	if (new_pos > arena->capacity)
 	{
-		return (NULL);
+		full_exit(shell);
+		perror("Ran out of memory\n");
+		exit(1);
 	}
 	arena->pos = new_pos;
 	out = (t_u8 *)arena + pos_aligned;

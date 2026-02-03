@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/05 19:23:18 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/05 19:23:53 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:04:30 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ void	expand_value(t_token *token, t_shell *shell, size_t len)
 	t_quote			quote_state;
 	t_pos			pos;
 
-	token->expanded = (char *)arena_push(shell->arena, len + 1, 0);
-	token->ws_mask = (bool *)arena_push(shell->arena, len, 0);
+	token->expanded = (char *)arena_push(shell->arena, len + 1, 0, shell);
+	token->ws_mask = (bool *)arena_push(shell->arena, len, 0, shell);
 	quote_state = NO_QUOTE;
 	pos.org = 0;
 	pos.exp = 0;

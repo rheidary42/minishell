@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/26 17:32:51 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/17 14:46:46 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:06:52 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,12 @@ t_token	*make_base_token(t_token *src, int start, int len, t_shell *shell)
 	t_token	*new;
 	int		i;
 
-	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0);
+	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0, shell);
 	new->type = TOKEN_WORD;
 	new->is_expanded = true;
 	new->value = src->value;
-	new->expanded = (char *)arena_push(shell->arena, len + 1, 0);
-	new->ws_mask = (bool *)arena_push(shell->arena, len, 0);
+	new->expanded = (char *)arena_push(shell->arena, len + 1, 0, shell);
+	new->ws_mask = (bool *)arena_push(shell->arena, len, 0, shell);
 	i = 0;
 	while (i < len)
 	{
@@ -153,11 +153,11 @@ t_token	*make_split_token(t_token *src, int start, int len, t_shell *shell)
 	t_token	*new;
 	int		i;
 
-	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0);
+	new = (t_token *)arena_push(shell->arena, sizeof(t_token), 0, shell);
 	new->type = TOKEN_WORD;
 	new->is_expanded = true;
 	new->value = src->value;
-	new->expanded = (char *)arena_push(shell->arena, len + 1, 0);
+	new->expanded = (char *)arena_push(shell->arena, len + 1, 0, shell);
 	new->ws_mask = NULL;
 	i = 0;
 	while (i < len)

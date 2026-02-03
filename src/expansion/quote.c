@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/26 17:32:37 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/09 16:36:19 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:06:30 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*remove_quotes(char *value, t_shell *shell)
 	t_quote	quote_state;
 
 	quote_state = NO_QUOTE;
-	dest = (char *)arena_push(shell->arena, ft_strlen(value) + 1, 0);
+	dest = (char *)arena_push(shell->arena, ft_strlen(value) + 1, 0, shell);
 	i = 0;
 	j = 0;
 	while (value[i] != '\0')

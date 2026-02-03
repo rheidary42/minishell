@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/05 19:20:57 by rheidary          #+#    #+#             */
-/*   Updated: 2026/01/09 23:01:23 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:10:54 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	needs_expansions(t_token *token)
 
 	if (token->type != TOKEN_WORD || token->value == NULL)
 		return (EXIT_FAILURE);
+	quote_state = NO_QUOTE;
 	i = 0;
 	while (token->value[i])
 	{

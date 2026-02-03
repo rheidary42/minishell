@@ -160,6 +160,8 @@ typedef struct  s_exec
 }   t_exec;
 
 
+void	full_exit(t_shell *shell);
+
 void	print_list(t_shell *shell);
 void	build_token_list(t_shell *shell, char **arr);
 int	validate_tokens(t_token *tokens);
@@ -172,7 +174,7 @@ void	build_commands(t_shell *shell);
 int	copy_var(t_env *env, char *str);
         // ARENA ALLOCATOR
 t_mem_arena	*arena_create(t_u64 capacity);
-void		*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero);
+void		*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero, t_shell *shell);
 void		arena_pop(t_mem_arena *arena, t_u64 size);
 void		arena_pop_to(t_mem_arena *arena, t_u64 pos);
 void		arena_clear(t_mem_arena *arena);
@@ -206,7 +208,7 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	exec_single_cmd(t_shell *shell, t_exec *exec);
 void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	build_pipeline(t_shell *shell, t_exec *exec);
-int	make_envp(t_env *copy_env, char **curr_env);
+int	copy_envp(t_env *copy_env, char **curr_env);
 char	**convert_envp(t_shell *shell);
 int	free_env_list(t_env *head);
 int	handle_heredoc(t_shell *shell, char *delim);

@@ -7,9 +7,9 @@
 static t_env *test_new_env(const char *name, const char *value, t_shell *shell)
 {
     t_env	*env;
-    env = (t_env *)arena_push(shell->arena, sizeof(t_env), 0);
-    env->name = arena_push(shell->arena, strlen(name) + 1, 0);
-    env->value = arena_push(shell->arena, strlen(value) + 1, 0);
+    env = (t_env *)arena_push(shell->arena, sizeof(t_env), 0, shell);
+    env->name = arena_push(shell->arena, strlen(name) + 1, 0, shell);
+    env->value = arena_push(shell->arena, strlen(value) + 1, 0, shell);
     strcpy(env->name, name);
     strcpy(env->value, value);
     env->next = NULL;
@@ -34,8 +34,8 @@ static void test_add_env(t_shell *shell, t_env *env)
 static t_token *test_new_token(const char *value, t_shell *shell)
 {
 	t_token *token;
-	token = (t_token *)arena_push(shell->arena, sizeof(t_token), 0);
-	token->value = arena_push(shell->arena, strlen(value) + 1, 0);
+	token = (t_token *)arena_push(shell->arena, sizeof(t_token), 0, shell);
+	token->value = arena_push(shell->arena, strlen(value) + 1, 0, shell);
 	strcpy(token->value, value);
 	token->expanded = NULL;
 	token->ws_mask = NULL;
