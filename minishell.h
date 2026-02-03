@@ -223,6 +223,12 @@ int	ft_export(t_env	*env, t_cmd *cmd);
 int	ft_exit(t_shell *shell, t_cmd *cmd, t_env *env);
 bool	is_flag(char *str);
 
+/* signals.c */
+
+void	sigint_handler(int sig);
+int	rl_ev_hook(void);
+void	setup_signals(void);
+
 /* ===========================
 ** Expansion functions
 ** =========================== */

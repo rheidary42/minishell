@@ -87,6 +87,8 @@ int	main(int ac, char **av, char **envp)
 	shell = init_shell(shell, envp);
 	if (shell == NULL)
 		return (EXIT_FAILURE);
+	setup_signals();
+	rl_signal_event_hook = rl_ev_hook;
 	while (true)
 	{
 		shell->line = read_line_input(shell->line);
@@ -94,6 +96,12 @@ int	main(int ac, char **av, char **envp)
 		{
 			full_exit(shell);
 			exit(0);
+		}
+		if (g_sig)
+		{
+			g_sig = 0;
+			shell->last_exit_status = 130;
+			continue;
 		}
 		parse(shell);
 		execution(shell);

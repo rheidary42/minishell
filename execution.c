@@ -29,6 +29,8 @@ int	execution(t_shell *shell)
 		return (1);
 	}
 	initialise_exec(&exec);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	if (shell->cmds->next == NULL)
 	{
 		return (exec_single_cmd(shell, &exec));

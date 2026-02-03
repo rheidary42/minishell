@@ -108,6 +108,8 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if (exec->child == 0)
 	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 		exec_in_child_helper(shell, cmd, exec);
 	}
 	waitpid(exec->child, &status, 0);
@@ -136,7 +138,7 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 		return (shell->last_exit_status);
 	}
 	builtin_id = is_builtin(cmd->argv[0]);
-	if (builtin_id >= 0 && cmd->redir == NULL)
+	if (builtin_id >= 0)
 	{
 		shell->last_exit_status = exec_builtin(shell, cmd, convert_envp(shell),
 							shell->env, builtin_id);
