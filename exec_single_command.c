@@ -66,33 +66,52 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	apply_redir(shell, cmd, cmd->redir, exec);
 	if ((envp = convert_envp(shell)) == NULL)
 	{
-		//free_and_close(shell, exec, envp);
+		printf("%s: 1heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
+		free_and_close(shell, cmd, exec);
 		exit(1);
 	}
 	if ((builtin_id = is_builtin(cmd->argv[0])) >= 0)
 	{
+		printf("%s: 2heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
 		shell->last_exit_status = exec_builtin(shell, cmd, envp, shell->env, builtin_id);
-		//free_and_close(shell, exec, envp);
-		exit(shell->last_exit_status);
+		int ret = shell->last_exit_status;
+		free_and_close(shell, cmd, exec);
+		exit(ret);
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
 	{
+		printf("%s: 3heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
 		exec->final_path = (char *)arena_push(shell->arena, ft_strlen(cmd->argv[0]) + 1, 0, shell);
 		ft_strlcpy(exec->final_path, cmd->argv[0], ft_strlen(cmd->argv[0]) + 1);
+		// free_env_list(shell->env);
 	}
 	else
 		path_lookup(cmd->argv[0], shell, exec);
 	if (exec->final_path == NULL)
 	{
 		perror(cmd->argv[0]);
-		//printf("%s: command not found\n", cmd->argv[0]);
-		//free_and_close(shell, exec, envp);
+		printf("%s: 4heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
+		// free_and_close(shell, cmd, exec);;
 		exit(127);
 	}
+
 	execve(exec->final_path, cmd->argv, envp);
-	perror(cmd->argv[0]);
-	//free_and_close(shell, exec, envp);
-	exit(127);
+	if (errno == EACCES)
+	{
+		perror(cmd->argv[0]);
+		free(shell->arena);
+		free_and_close(shell, cmd, exec);
+		printf("reaching the end after execve\n");
+		exit(126);
+	}
+	else
+	{
+		perror(cmd->argv[0]);
+		free(shell->arena);
+		free_and_close(shell, cmd, exec);
+		printf("reaching the end after execve\n");
+		exit(127);
+	}
 }
 
 int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
@@ -112,11 +131,25 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		signal(SIGQUIT, SIG_DFL);
 		exec_in_child_helper(shell, cmd, exec);
 	}
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	waitpid(exec->child, &status, 0);
+	setup_signals();
 	if (WIFEXITED(status) != 0)
 		shell->last_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status) != 0)
-		shell->last_exit_status = 128 + WTERMSIG(status);
+	{
+		int gl_sig = WTERMSIG(status);
+		if (gl_sig == SIGINT)
+		{
+			write(1, "\n", 1);
+		}
+		if (gl_sig == SIGQUIT)
+		{
+			write(1, "Quit (core dumped)\n", 20);
+		}
+		shell->last_exit_status = 128 + gl_sig;
+	}
 	return (shell->last_exit_status);
 }
 

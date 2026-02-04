@@ -1,14 +1,20 @@
 #include "minishell.h"
 
-int	ft_env(char **env)
+int	ft_env(t_env *env)
 {
-	int	i;
+	t_env	*curr;
 
-	while (env && env[i])
+	curr = env;
+	while (curr != NULL)
 	{
-		write(STDOUT_FILENO, env[i], ft_strlen(env[i]));
-		write(STDOUT_FILENO, "\n", 1);
-		i++;
+		if (curr->exported == true)
+		{
+			write(STDOUT_FILENO, curr->name, ft_strlen(curr->name));
+			write(STDOUT_FILENO, "=", 1);
+			write(STDOUT_FILENO, curr->value, ft_strlen(curr->value));
+			write(STDOUT_FILENO, "\n", 1);
+		}
+		curr = curr->next;
 	}
 	return (0);
 }

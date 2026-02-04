@@ -14,7 +14,18 @@ void	wait_for_children(t_shell *shell, t_exec *exec)
 			if (WIFEXITED(status) != 0)
 				shell->last_exit_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status) != 0)
-				shell->last_exit_status = 128 + WTERMSIG(status);
+			{
+				int gl_sig = WTERMSIG(status);
+				if (gl_sig == SIGINT)
+				{
+					write(1, "\n", 1);
+				}
+				if (gl_sig == SIGQUIT)
+				{
+					write(1, "Quit (core dumped)\n", 20);
+				}
+				shell->last_exit_status = 128 + gl_sig;
+			}
 		}
 	}
 }
@@ -70,6 +81,7 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 		cmd = cmd->next;
 		exec->last_child = exec->child;
 	}
+	setup_signals();
 	wait_for_children(shell, exec);
 	return (shell->last_exit_status);
 }

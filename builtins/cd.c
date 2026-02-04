@@ -9,6 +9,7 @@ int	update_pwd(t_env *env, char *oldpwd, char *pwd)
 	{
 		if (strcmp(curr->name, "PWD") == 0 && pwd)
 		{
+			printf("hi");
 			free(curr->value);
 			curr->value = ft_calloc(1, ft_strlen(pwd) + 1);
 			if (!curr->value)
@@ -51,7 +52,7 @@ int	solo_cd(t_env *env)
 	return (update_pwd(env, oldpwd, pwd));
 }
 
-int	cd(t_env *env, t_cmd *cmd)
+int	ft_cd(t_env *env, t_cmd *cmd)
 {
 	int		i;
 	char	*oldpwd;

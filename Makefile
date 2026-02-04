@@ -44,6 +44,7 @@ SRCS =	main.c\
 		builtins/env.c\
 		builtins/export.c\
 		builtins/exit.c\
+		builtins/cd.c\
 		src/expansion/parameter/expansion_core.c\
 		src/expansion/parameter/expansion_insert.c\
 		src/expansion/parameter/expansion_size.c\
@@ -58,6 +59,9 @@ all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS)
 	cc $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
+
+runval:
+	valgrind --leak-check=full --show-leak-kinds=all --track-fds=all --trace-children=yes --suppressions=readline.supp ./minishell
 
 # --- libraries ---
 

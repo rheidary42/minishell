@@ -144,6 +144,7 @@ typedef struct s_shell
     t_env   *env;
     char    *line;
     int     last_exit_status;
+    int     shlvl;
     t_mem_arena *arena;
 }   t_shell;
 
@@ -208,7 +209,7 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	exec_single_cmd(t_shell *shell, t_exec *exec);
 void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec);
 int	build_pipeline(t_shell *shell, t_exec *exec);
-int	copy_envp(t_env *copy_env, char **curr_env);
+int	copy_envp(t_shell *shell, t_env *copy_env, char **curr_env);
 char	**convert_envp(t_shell *shell);
 int	free_env_list(t_env *head);
 int	handle_heredoc(t_shell *shell, char *delim);
@@ -216,11 +217,12 @@ int	handle_heredoc(t_shell *shell, char *delim);
 // Placeholder for built-in execution function
 int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id);
 int	ft_echo(t_cmd *cmd);
-int	ft_env(char **env);
+int	ft_env(t_env *env);
 int	ft_pwd(void);
 int	ft_unset(t_env *env, t_cmd *cmd);
 int	ft_export(t_env	*env, t_cmd *cmd);
 int	ft_exit(t_shell *shell, t_cmd *cmd, t_env *env);
+int	ft_cd(t_env *env, t_cmd *cmd);
 bool	is_flag(char *str);
 
 /* signals.c */
