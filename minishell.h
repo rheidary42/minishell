@@ -26,6 +26,7 @@
 /* Signals (signal, sigaction, sigemptyset, sigaddset, kill) */
 # include <signal.h>
 
+# include <bits/sigaction.h>
 /* Waiting (wait, waitpid, wait3, wait4) */
 # include <sys/wait.h>
 
@@ -156,6 +157,8 @@ typedef struct  s_exec
     int     pipe_fds[2];
     int     prev_fd;
     int     file_fd;
+    int     sig_flag;
+    int     errno_save;
     pid_t   child;
     pid_t   last_child;
 }   t_exec;
@@ -213,6 +216,7 @@ int	copy_envp(t_shell *shell, t_env *copy_env, char **curr_env);
 char	**convert_envp(t_shell *shell);
 int	free_env_list(t_env *head);
 int	handle_heredoc(t_shell *shell, char *delim);
+int	heredoc_collector(t_shell *shell);
 
 // Placeholder for built-in execution function
 int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id);
@@ -227,7 +231,9 @@ bool	is_flag(char *str);
 
 /* signals.c */
 
+void	sig_err_msg(t_shell *shell, int sig_num);
 void	sigint_handler(int sig);
+void	heredoc_sig_handler(int sig);
 int	rl_ev_hook(void);
 void	setup_signals(void);
 

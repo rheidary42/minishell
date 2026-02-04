@@ -19,6 +19,29 @@ int	is_builtin(char *cmd)
 	return (-1);
 }
 
+void	free_heredocs(t_shell *shell)
+{
+	t_cmd	*cmd;
+	t_redir	*r;
+
+	cmd = shell->cmds;
+	while (cmd != NULL)
+	{
+		r = cmd->redir;
+		while (r != NULL)
+		{
+			if (r->type == TOKEN_HEREDOC && r->file != NULL)
+			{
+				unlink(r->file);
+				free(r->file);
+				r->file = NULL;
+			}
+			r = r->next;
+		}
+		cmd = cmd->next;
+	}
+}
+
 int	execution(t_shell *shell)
 {
 	t_exec	exec;
@@ -28,7 +51,15 @@ int	execution(t_shell *shell)
 		// no commands;
 		return (1);
 	}
+	setup_signals();
 	initialise_exec(&exec);
+	if (heredoc_collector(shell) == 1)
+	{
+		setup_signals();
+		shell->last_exit_status = 130;
+	//	free_heredocs(shell);
+		return (1);
+	}
 	if (shell->cmds->next == NULL)
 	{
 		return (exec_single_cmd(shell, &exec));

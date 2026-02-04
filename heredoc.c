@@ -14,64 +14,71 @@ char	*get_here_doc_name(t_shell *shell)
 	return (tmp_name);
 }
 
-void	clean_heredoc(char *tmp_file)
-{
-	write(1, "\n", 1);
-	unlink(tmp_file);
-	free(tmp_file);
-	exit(130);
-}
-
-void	sig_handler(int sig)
-{
-	g_sig = sig;
-	//if you need a new line, you can use rl_hook to hook in a function where you use ioctl to insert a new line
-}
-
-void	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
+int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 {
 	char	*line;
 	int		fd;
+	// void(*old_sigint)(int);
+	// void(*old_sigquit)(int);
 
-	signal(SIGINT, sig_handler);
-	signal(SIGQUIT, SIG_IGN);
+	// old_sigint = signal(SIGINT, heredoc_sig_handler);
+	// old_sigquit = signal(SIGQUIT, SIG_IGN);
 	fd = open(tmp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
-		return ;
+		return (-1);
 	while (1)
 	{
-		g_sig = 0;
 		line = readline("> ");
 		if (g_sig == SIGINT)
-			clean_heredoc(tmp_file);
-		if (line == NULL || ft_strcmp(line, delim) == 0)
+		{
+			free(line);
+			close(fd);
+			// signal(SIGINT, old_sigint);
+			// signal(SIGQUIT, old_sigquit);
+			printf("HI");
+			return (130);
+		}
+		if (line == NULL || ft_strcmp(line, delim) == 0  || g_sig == SIGINT)
+		{
+			printf("NOT HI");
+
+			free(line);
 			break;
+		}
 		write(fd, line, ft_strlen(line));
 		write(fd, "\n", 1);
 		free(line);
 	}
-	free(line);
 	close(fd);
+	return (0);
 }
 
-int	handle_heredoc(t_shell *shell, char *delim)
+int	heredoc_collector(t_shell *shell)
 {
-	char	*tmp_file;
-	int		fd;
-	int		status;
+	t_cmd	*cmd;
+	t_redir	*r;
+	char	*tmp;
 
-	tmp_file = get_here_doc_name(shell);
-	run_heredoc(shell, tmp_file, delim);
-	fd = open(tmp_file, O_RDONLY);
-	unlink(tmp_file);
-	return (fd);
+	cmd = shell->cmds;
+	while (cmd != NULL)
+	{
+		r = cmd->redir;
+		while (r != NULL)
+		{
+			if (r->type == TOKEN_HEREDOC)
+			{
+				tmp = get_here_doc_name(shell);
+				if (run_heredoc(shell, tmp, r->file) == 130)
+				{
+					unlink(tmp);
+					// free(tmp);
+					return (1);
+				}
+				r->file = tmp; // arena free?
+			}
+			r = r->next;
+		}
+		cmd = cmd->next;
+	}
+	return (0);
 }
-
-
-// int	main(int ac, char **av)
-// {
-// 	t_shell *shell;
-// 	int fd = handle_heredoc(shell, av[1]);
-// 	close(fd);
-// 	return 0;
-// }

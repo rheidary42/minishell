@@ -6,13 +6,7 @@ int	consume_redirs_only(t_shell *shell, t_redir *redir)
 
 	while (redir)
 	{
-		if (redir->type == TOKEN_HEREDOC)
-		{
-			fd = handle_heredoc(shell, redir->file);
-			if (fd >= 0)
-				close(fd);
-		}
-		else if (redir->type == TOKEN_REDIR_IN)
+		if (redir->type == TOKEN_REDIR_IN || redir->type == TOKEN_HEREDOC)
 			fd = open(redir->file, O_RDONLY);
 		else if (redir->type == TOKEN_REDIR_OUT)
 			fd = open(redir->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -39,10 +33,8 @@ void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 			exec->file_fd = open(r->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		else if (r->type == TOKEN_APPEND)
 			exec->file_fd = open(r->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else if (r->type == TOKEN_REDIR_IN)
+		else if (r->type == TOKEN_REDIR_IN || r->type == TOKEN_HEREDOC)
 			exec->file_fd = open(r->file, O_RDONLY);
-		else if (r->type == TOKEN_HEREDOC)
-			exec->file_fd = handle_heredoc(shell, r->file);
 		if (exec->file_fd == -1)
 		{
 			free_and_close(shell, cmd, exec);
@@ -72,7 +64,6 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if ((builtin_id = is_builtin(cmd->argv[0])) >= 0)
 	{
-		printf("%s: 2heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
 		shell->last_exit_status = exec_builtin(shell, cmd, envp, shell->env, builtin_id);
 		int ret = shell->last_exit_status;
 		free_and_close(shell, cmd, exec);
@@ -80,7 +71,6 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
 	{
-		printf("%s: 3heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
 		exec->final_path = (char *)arena_push(shell->arena, ft_strlen(cmd->argv[0]) + 1, 0, shell);
 		ft_strlcpy(exec->final_path, cmd->argv[0], ft_strlen(cmd->argv[0]) + 1);
 		// free_env_list(shell->env);
@@ -90,28 +80,18 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	if (exec->final_path == NULL)
 	{
 		perror(cmd->argv[0]);
-		printf("%s: 4heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
 		// free_and_close(shell, cmd, exec);;
 		exit(127);
 	}
-
 	execve(exec->final_path, cmd->argv, envp);
-	if (errno == EACCES)
-	{
-		perror(cmd->argv[0]);
-		free(shell->arena);
-		free_and_close(shell, cmd, exec);
-		printf("reaching the end after execve\n");
+	exec->errno_save = errno;
+	perror(cmd->argv[0]);
+	free(shell->arena);
+	free_and_close(shell, cmd, exec);
+	if (exec->errno_save == EACCES)
 		exit(126);
-	}
 	else
-	{
-		perror(cmd->argv[0]);
-		free(shell->arena);
-		free_and_close(shell, cmd, exec);
-		printf("reaching the end after execve\n");
 		exit(127);
-	}
 }
 
 int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)

@@ -106,6 +106,7 @@ int	main(int ac, char **av, char **envp)
 		parse(shell);
 		execution(shell);
 		arena_clear(shell->arena);
+		g_sig = 0;
 		shell->cmds = NULL;
 		shell->tokens = NULL;
 	}

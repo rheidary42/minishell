@@ -4,34 +4,35 @@ void	wait_for_children(t_shell *shell, t_exec *exec)
 {
 	pid_t	temp_pid;
 	int		status;
+	int		sig_num;
 
+	sig_num = 0;
 	temp_pid = 1;
-	while (temp_pid > 0)
+	while (1)
 	{
 		temp_pid = wait(&status);
-		if (temp_pid == exec->last_child)
+		if (temp_pid == -1)
 		{
-			if (WIFEXITED(status) != 0)
-				shell->last_exit_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status) != 0)
-			{
-				int gl_sig = WTERMSIG(status);
-				if (gl_sig == SIGINT)
-				{
-					write(1, "\n", 1);
-				}
-				if (gl_sig == SIGQUIT)
-				{
-					write(1, "Quit (core dumped)\n", 20);
-				}
-				shell->last_exit_status = 128 + gl_sig;
-			}
+			if (errno == EINTR)
+				continue;
+			break;
 		}
+		if (WIFSIGNALED(status) != 0)
+		{
+			sig_num = WTERMSIG(status);
+			exec->sig_flag = 1;
+		}
+		if (temp_pid == exec->last_child && WIFEXITED(status) != 0)
+				shell->last_exit_status = WEXITSTATUS(status);
 	}
+	if (exec->sig_flag == 1)
+		sig_err_msg(shell, sig_num);
 }
 
 void	exec_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	if (exec->prev_fd != -1)
 	{
 		if (dup2(exec->prev_fd, STDIN_FILENO) == -1)
@@ -61,6 +62,8 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 	t_cmd	*cmd;
 
 	cmd = shell->cmds;
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	while (cmd != NULL)
 	{
 		if (cmd->next != NULL)
@@ -81,7 +84,7 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 		cmd = cmd->next;
 		exec->last_child = exec->child;
 	}
-	setup_signals();
 	wait_for_children(shell, exec);
+	setup_signals();
 	return (shell->last_exit_status);
 }

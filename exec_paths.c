@@ -71,7 +71,7 @@ char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell)
 	int		i;
 
 	i = 0;
-	if (all_paths == NULL)
+	if (all_paths == NULL || cmd_name == NULL || cmd_name[0] == '\0')
 		return (NULL);
 	while (all_paths[i] != NULL)
 	{
