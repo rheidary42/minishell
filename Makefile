@@ -63,6 +63,8 @@ $(NAME): $(LIBFT) $(OBJS)
 runval:
 	valgrind --leak-check=full --show-leak-kinds=all --track-fds=all --trace-children=yes --suppressions=readline.supp ./minishell
 
+tidy: all clean
+
 # --- libraries ---
 
 $(LIBFT):
