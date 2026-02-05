@@ -41,6 +41,12 @@ int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 		}
 		if (line == NULL || ft_strcmp(line, delim) == 0)
 		{
+			if (line == NULL)
+			{
+				write(STDERR_FILENO, "warning: here-document delimited by end-of-file (wanted `", 58);
+				write(STDERR_FILENO, delim, ft_strlen(delim));
+				write(STDERR_FILENO, "')\n", 3);
+			}
 			free(line);
 			break;
 		}
