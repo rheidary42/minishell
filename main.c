@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:53:58 by rheidary          #+#    #+#             */
-/*   Updated: 2026/02/03 11:58:31 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/05 14:05:40 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,10 @@ int	main(int ac, char **av, char **envp)
 		{
 			g_sig = 0;
 			shell->last_exit_status = 130;
-			continue;
+			continue ;
 		}
-		parse(shell);
-		execution(shell);
+		if (parse(shell) == EXIT_SUCCESS)
+			execution(shell);
 		arena_clear(shell->arena);
 		g_sig = 0;
 		shell->cmds = NULL;

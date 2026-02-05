@@ -171,7 +171,7 @@ void	build_token_list(t_shell *shell, char **arr);
 int	validate_tokens(t_token *tokens);
 char	**split(t_shell *shell);
 
-void	parse(t_shell *shell);
+int		parse(t_shell *shell);
 t_token	*tokenize(t_shell *shell);
 int	    token_len(char *str);
 void	build_commands(t_shell *shell);
