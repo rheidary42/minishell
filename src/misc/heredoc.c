@@ -18,11 +18,7 @@ int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 {
 	char	*line;
 	int		fd;
-	// void(*old_sigint)(int);
-	// void(*old_sigquit)(int);
 
-	// old_sigint = signal(SIGINT, heredoc_sig_handler);
-	// old_sigquit = signal(SIGQUIT, SIG_IGN);
 	fd = open(tmp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return (-1);
@@ -33,15 +29,10 @@ int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 		{
 			free(line);
 			close(fd);
-			// signal(SIGINT, old_sigint);
-			// signal(SIGQUIT, old_sigquit);
-			printf("HI");
 			return (130);
 		}
-		if (line == NULL || ft_strcmp(line, delim) == 0  || g_sig == SIGINT)
+		if (line == NULL || ft_strcmp(line, delim) == 0)
 		{
-			printf("NOT HI");
-
 			free(line);
 			break;
 		}
@@ -49,8 +40,7 @@ int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 		write(fd, "\n", 1);
 		free(line);
 	}
-	close(fd);
-	return (0);
+	return (close(fd), 0);
 }
 
 int	heredoc_collector(t_shell *shell)
@@ -59,6 +49,7 @@ int	heredoc_collector(t_shell *shell)
 	t_redir	*r;
 	char	*tmp;
 
+	setup_prompt_signals();
 	cmd = shell->cmds;
 	while (cmd != NULL)
 	{
@@ -72,6 +63,7 @@ int	heredoc_collector(t_shell *shell)
 				{
 					unlink(tmp);
 					// free(tmp);
+					setup_prompt_signals();
 					return (1);
 				}
 				r->file = tmp; // arena free?
@@ -80,5 +72,6 @@ int	heredoc_collector(t_shell *shell)
 		}
 		cmd = cmd->next;
 	}
+	setup_prompt_signals();
 	return (0);
 }

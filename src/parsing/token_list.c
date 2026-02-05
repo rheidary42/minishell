@@ -72,9 +72,7 @@ void	append_node(t_shell *shell, t_token *new)
 
 t_toktype	token_type(char *str)
 {
-	if (ft_strncmp(str, "EOF", 3) == 0)
-		return (TOKEN_EOF);
-	else if (ft_strncmp((const char *)str, ">>", 2) == 0)
+	if (ft_strncmp((const char *)str, ">>", 2) == 0)
 		return (TOKEN_APPEND);
 	else if (ft_strncmp((const char *)str, "<<", 2) == 0)
 		return (TOKEN_HEREDOC);

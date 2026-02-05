@@ -87,7 +87,6 @@ typedef enum e_toktype
     TOKEN_REDIR_OUT,   // >
     TOKEN_APPEND,      // >>
     TOKEN_HEREDOC,     // <<
-    TOKEN_EOF          // end of input
 }   t_toktype;
 
 typedef enum e_builtins
@@ -235,7 +234,9 @@ void	sig_err_msg(t_shell *shell, int sig_num);
 void	sigint_handler(int sig);
 void	heredoc_sig_handler(int sig);
 int	rl_ev_hook(void);
-void	setup_signals(void);
+int	rl_heredoc_hook(void);
+void	setup_prompt_signals(void);
+void    setup_heredoc_signals(void);
 
 /* ===========================
 ** Expansion functions

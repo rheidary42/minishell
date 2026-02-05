@@ -87,8 +87,8 @@ int	main(int ac, char **av, char **envp)
 	shell = init_shell(shell, envp);
 	if (shell == NULL)
 		return (EXIT_FAILURE);
-	setup_signals();
-	rl_signal_event_hook = rl_ev_hook;
+	setup_prompt_signals();
+	rl_event_hook = rl_ev_hook;
 	while (true)
 	{
 		shell->line = read_line_input(shell->line);

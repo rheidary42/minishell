@@ -51,11 +51,10 @@ int	execution(t_shell *shell)
 		// no commands;
 		return (1);
 	}
-	setup_signals();
+	setup_prompt_signals();
 	initialise_exec(&exec);
 	if (heredoc_collector(shell) == 1)
 	{
-		setup_signals();
 		shell->last_exit_status = 130;
 	//	free_heredocs(shell);
 		return (1);

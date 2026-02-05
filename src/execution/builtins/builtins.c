@@ -4,7 +4,7 @@
 // Replace with real builtin implementations later.
 int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id)
 {
-	setup_signals();
+	setup_prompt_signals();
 	if (builtin_id == EECHO)
 		return (ft_echo(cmd));
 	if (builtin_id == CD)

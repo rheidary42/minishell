@@ -114,7 +114,7 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 	waitpid(exec->child, &status, 0);
-	setup_signals();
+	setup_prompt_signals();
 	if (WIFEXITED(status) != 0)
 		shell->last_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status) != 0)
