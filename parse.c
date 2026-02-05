@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 12:23:09 by rheidary          #+#    #+#             */
-/*   Updated: 2026/02/05 14:06:40 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/05 14:25:21 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ t_token	*tokenize(t_shell *shell)
 	build_token_list(shell, arr);
 	if (!validate_tokens(shell->tokens))
 	{
-		perror("minishell: syntax error\n");
+		write(STDERR_FILENO, "minishell: syntax error\n", 25);
 		shell->last_exit_status = 2;
 		return (NULL);
 	}

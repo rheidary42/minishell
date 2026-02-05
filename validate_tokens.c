@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 13:16:17 by rheidary          #+#    #+#             */
-/*   Updated: 2025/10/23 12:37:15 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/05 14:24:35 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,21 @@ int	is_pipe(t_token *token)
 	return (token->type == TOKEN_PIPE);
 }
 
+int	is_unclosed_quote(char *str)
+{
+	int		i;
+	t_quote	quote_state;
+
+	quote_state = NO_QUOTE;
+	i = 0;
+	while (str[i])
+	{
+		update_quote_state(str[i], &quote_state);
+		i++;
+	}
+	return (quote_state != NO_QUOTE);
+}
+
 int	validate_tokens(t_token *tokens)
 {
 	t_token	*curr;
@@ -52,7 +67,9 @@ int	validate_tokens(t_token *tokens)
 		return (0);
 	while (curr)
 	{
-		if (is_pipe(curr) != 0)
+		if (is_unclosed_quote(curr->value))
+			return (0);
+		else if (is_pipe(curr) != 0)
 		{
 			if (curr->next == NULL || is_pipe(curr->next) != 0)
 				return (0);
