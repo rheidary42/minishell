@@ -143,6 +143,7 @@ typedef struct s_shell
     t_token *tokens;
     t_env   *env;
     char    *line;
+    bool    is_interactive;
     int     last_exit_status;
     int     shlvl;
     t_mem_arena *arena;
@@ -188,7 +189,7 @@ void	free_env(t_env **env);
 
         //HELPERS
 char	*ft_strcpy(char *dest, char *src);
-char	*read_line_input(char *prev_line);
+char	*read_line_input(t_shell *shell, char *prev_line);
 
        //EXECUTION HELPERS
 int     is_builtin(char *cmd);
@@ -223,7 +224,7 @@ int	ft_echo(t_cmd *cmd);
 int	ft_env(t_env *env);
 int	ft_pwd(void);
 int	ft_unset(t_env *env, t_cmd *cmd);
-int	ft_export(t_env	*env, t_cmd *cmd);
+int	ft_export(t_shell *shell, t_env *env, t_cmd *cmd);
 int	ft_exit(t_shell *shell, t_cmd *cmd, t_env *env);
 int	ft_cd(t_env *env, t_cmd *cmd);
 bool	is_flag(char *str);
@@ -232,11 +233,10 @@ bool	is_flag(char *str);
 
 void	sig_err_msg(t_shell *shell, int sig_num);
 void	sigint_handler(int sig);
-void	heredoc_sig_handler(int sig);
 int	rl_ev_hook(void);
-int	rl_heredoc_hook(void);
 void	setup_prompt_signals(void);
-void    setup_heredoc_signals(void);
+void    setup_noninteractive_signals(void);
+void    setup_signals(t_shell *shell);
 
 /* ===========================
 ** Expansion functions

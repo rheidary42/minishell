@@ -49,6 +49,18 @@ int	rl_heredoc_hook(void)
 	return (0);
 }
 
+void	setup_noninteractive_signals(void)
+{
+	struct sigaction sa;
+
+	sa.sa_handler = SIG_DFL;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
 void	setup_prompt_signals(void)
 {
 	struct sigaction sa;
@@ -63,4 +75,12 @@ void	setup_prompt_signals(void)
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_flags = 0;
 	sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+void	setup_signals(t_shell *shell)
+{
+	if (shell->is_interactive == true)
+		setup_prompt_signals();
+	else
+		setup_noninteractive_signals();
 }

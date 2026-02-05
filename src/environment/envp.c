@@ -54,15 +54,21 @@ int	copy_var(t_env *env, char *str)
 int	free_env_list(t_env *head)
 {
 	t_env	*tmp;
-
+	t_env	*save;
+	if (head == NULL)
+		return (0);
+	save = head;
 	while (head)
 	{
 		tmp = head->next;
-		free(head->name);
-		free(head->value);
+		if (head->name)
+			free(head->name);
+		if (head->value)
+			free(head->value);
 		free(head);
 		head = tmp;
 	}
+	save = NULL;
 	return (1);
 }
 

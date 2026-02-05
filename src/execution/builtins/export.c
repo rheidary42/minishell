@@ -86,7 +86,7 @@ int	process_var(t_env *env, char *var)
 	return (0);
 }
 
-int	ft_export(t_env	*env, t_cmd *cmd)
+int	ft_export(t_shell *shell, t_env *env, t_cmd *cmd)
 {
 	int	i;
 
@@ -104,7 +104,9 @@ int	ft_export(t_env	*env, t_cmd *cmd)
 			continue;
 		}
 		if (process_var(env, cmd->argv[i]) == 1)
-			return (free_env_list(env), 2);
+		{
+			return (free_env(&shell->env), 2);
+		}
 		i++;
 	}
 	return (0);

@@ -17,6 +17,7 @@ char	*get_here_doc_name(t_shell *shell)
 int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 {
 	char	*line;
+	char	*tmp;
 	int		fd;
 
 	fd = open(tmp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -24,7 +25,14 @@ int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 		return (-1);
 	while (1)
 	{
-		line = readline("> ");
+		if (shell->is_interactive == true)
+			line = readline("> ");
+		else
+		{
+			tmp = get_next_line(fileno(stdin));
+			line = ft_strtrim(tmp, "\n");
+			free(tmp);
+		}
 		if (g_sig == SIGINT)
 		{
 			free(line);
@@ -49,7 +57,7 @@ int	heredoc_collector(t_shell *shell)
 	t_redir	*r;
 	char	*tmp;
 
-	setup_prompt_signals();
+	setup_signals(shell);
 	cmd = shell->cmds;
 	while (cmd != NULL)
 	{
@@ -63,7 +71,7 @@ int	heredoc_collector(t_shell *shell)
 				{
 					unlink(tmp);
 					// free(tmp);
-					setup_prompt_signals();
+					setup_signals(shell);
 					return (1);
 				}
 				r->file = tmp; // arena free?
@@ -72,6 +80,6 @@ int	heredoc_collector(t_shell *shell)
 		}
 		cmd = cmd->next;
 	}
-	setup_prompt_signals();
+	setup_signals(shell);
 	return (0);
 }

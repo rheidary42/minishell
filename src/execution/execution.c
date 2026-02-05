@@ -51,7 +51,7 @@ int	execution(t_shell *shell)
 		// no commands;
 		return (1);
 	}
-	setup_prompt_signals();
+	setup_signals(shell);
 	initialise_exec(&exec);
 	if (heredoc_collector(shell) == 1)
 	{

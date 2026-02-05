@@ -85,6 +85,6 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 		exec->last_child = exec->child;
 	}
 	wait_for_children(shell, exec);
-	setup_prompt_signals();
+	setup_signals(shell);
 	return (shell->last_exit_status);
 }

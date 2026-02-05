@@ -19,38 +19,37 @@ LIBFT := libs/libft/libft.a
 GNL_PATH := libs/get_next_line
 GNL_SRCS := $(GNL_PATH)/get_next_line.c $(GNL_PATH)/get_next_line_utils.c
 SRCS =	main.c\
-		parse.c\
-		split.c\
-		token_list.c\
-		allocation.c\
-		build_commands.c\
-		convert_envp.c\
-		envp.c\
-		exec_helper.c\
-		exec_paths.c\
-		exec_pipeline.c\
-		exec_single_command.c\
-		execution.c\
-		helper1.c\
-		builtins.c\
-		heredoc.c\
-		param_helper.c\
-		signals.c\
-		validate_tokens.c\
-		arena.c\
-		builtins/echo.c\
-		builtins/pwd.c\
-		builtins/unset.c\
-		builtins/env.c\
-		builtins/export.c\
-		builtins/exit.c\
-		builtins/cd.c\
-		src/expansion/parameter/expansion_core.c\
-		src/expansion/parameter/expansion_insert.c\
-		src/expansion/parameter/expansion_size.c\
-		src/expansion/parameter/expansion_var.c\
-		src/expansion/word.c\
-		src/expansion/quote.c\
+		src/parsing/parse.c\
+		src/parsing/split.c\
+		src/parsing/token_list.c\
+		src/memory/allocation.c\
+		src/parsing/build_commands.c\
+		src/environment/convert_envp.c\
+		src/environment/envp.c\
+		src/execution/exec_helper.c\
+		src/execution/exec_paths.c\
+		src/execution/exec_pipeline.c\
+		src/execution/exec_single_command.c\
+		src/execution/execution.c\
+		src/execution/builtins/builtins.c\
+		src/misc/heredoc.c\
+		src/parsing/expansion/parameter/param_helper.c\
+		src/misc/signals.c\
+		src/parsing/validate_tokens.c\
+		src/memory/arena.c\
+		src/execution/builtins/echo.c\
+		src/execution/builtins/pwd.c\
+		src/execution/builtins/unset.c\
+		src/execution/builtins/env.c\
+		src/execution/builtins/export.c\
+		src/execution/builtins/exit.c\
+		src/execution/builtins/cd.c\
+		src/parsing/expansion/parameter/expansion_core.c\
+		src/parsing/expansion/parameter/expansion_insert.c\
+		src/parsing/expansion/parameter/expansion_size.c\
+		src/parsing/expansion/parameter/expansion_var.c\
+		src/parsing/expansion/word.c\
+		src/parsing/expansion/quote.c\
  		$(GNL_SRCS)\
 
 OBJS := $(SRCS:.c=.o)

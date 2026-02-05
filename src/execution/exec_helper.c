@@ -37,6 +37,7 @@ void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		close(exec->file_fd);
 		exec->file_fd = -1;
 	}
+	free(shell->arena);
 	free_env_list(shell->env);
 	free(shell);
 }

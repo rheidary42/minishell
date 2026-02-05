@@ -24,11 +24,7 @@ t_token	*tokenize(t_shell *shell)
 	build_token_list(shell, arr);
 	if (!validate_tokens(shell->tokens))
 	{
-<<<<<<< HEAD:src/parsing/parse.c
 		write(STDERR_FILENO, "minishell: syntax error\n", 25);
-=======
-		write(1,"minishell: syntax error\n", 25);
->>>>>>> 2327a4f (fix: multiple heredoc support, signals working with heredoc and normally, removed TOKEN_EOF):parse.c
 		shell->last_exit_status = 2;
 		return (NULL);
 	}

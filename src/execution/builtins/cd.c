@@ -9,7 +9,6 @@ int	update_pwd(t_env *env, char *oldpwd, char *pwd)
 	{
 		if (strcmp(curr->name, "PWD") == 0 && pwd)
 		{
-			printf("hi");
 			free(curr->value);
 			curr->value = ft_calloc(1, ft_strlen(pwd) + 1);
 			if (!curr->value)

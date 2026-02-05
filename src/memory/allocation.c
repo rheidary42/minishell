@@ -33,6 +33,7 @@ void	free_env(t_env **env)
 	}
 //	free(env);
 	*env = NULL;
+	env = NULL;
 }
 
 // TO-DO pre-set all values to NULL so if conditions work properly

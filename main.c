@@ -54,7 +54,7 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 	return (shell);
 }
 
-char	*read_line_input(char *prev_line)
+char	*read_line_input(t_shell *shell, char *prev_line)
 {
 	char	*tmp;
 	char	*line;
@@ -64,7 +64,7 @@ char	*read_line_input(char *prev_line)
 		free (prev_line);
 		prev_line = NULL;
 	}
-	if (isatty(fileno(stdin)))
+	if (shell->is_interactive == true)
 	{
 		line = readline("minishell>");
 		if (line && line[0] != '\0')
@@ -87,11 +87,15 @@ int	main(int ac, char **av, char **envp)
 	shell = init_shell(shell, envp);
 	if (shell == NULL)
 		return (EXIT_FAILURE);
-	setup_prompt_signals();
+	if (isatty(fileno(stdin)) == true)
+		shell->is_interactive = 1;
+	else
+		shell->is_interactive = 0;
+	setup_signals(shell);
 	rl_event_hook = rl_ev_hook;
 	while (true)
 	{
-		shell->line = read_line_input(shell->line);
+		shell->line = read_line_input(shell, shell->line);
 		if (shell->line == NULL)    // If EOF (CTRL-D) detected exit
 		{
 			full_exit(shell);
