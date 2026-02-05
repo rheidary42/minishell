@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 09:53:45 by rheidary          #+#    #+#             */
-/*   Updated: 2025/04/29 22:16:16 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/05 14:15:35 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	ft_isalnum(int c)
 {
-	if (ft_isalpha(c) || ft_isdigit(c))
+	if (ft_isalpha(c) || ft_isdigit(c) || c == '_')
 		return (1);
 	return (0);
 }
