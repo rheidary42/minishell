@@ -202,7 +202,7 @@ void	initialise_exec(t_exec *exec);
 int     count_path(char *paths_from_env);
 char	*get_paths_from_env(t_env *env);
 char	**split_paths(char *paths_from_env, t_shell *shell);
-void	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec);
+int	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec);
 char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell);
 void	path_lookup(char *cmd_name, t_shell *shell, t_exec *exec);
 void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);

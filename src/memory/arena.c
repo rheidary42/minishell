@@ -39,7 +39,7 @@ void	*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero,
 	if (new_pos > arena->capacity)
 	{
 		full_exit(shell);
-		perror("Ran out of memory\n");
+		write(STDERR_FILENO, "Ran out of memory\n", 19);
 		exit(1);
 	}
 	arena->pos = new_pos;
