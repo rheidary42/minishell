@@ -60,7 +60,7 @@ $(NAME): $(LIBFT) $(OBJS)
 	cc $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
 
 runval:
-	valgrind --leak-check=full --show-leak-kinds=all --track-fds=all --trace-children=yes --suppressions=readline.supp ./minishell
+	valgrind -s --leak-check=full --show-leak-kinds=all --track-fds=all --trace-children=yes --suppressions=readline.supp ./minishell
 
 tidy: all clean
 

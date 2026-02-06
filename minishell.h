@@ -170,6 +170,9 @@ void	print_list(t_shell *shell);
 void	build_token_list(t_shell *shell, char **arr);
 int	validate_tokens(t_token *tokens);
 char	**split(t_shell *shell);
+int	add_env_var(t_shell *shell, t_env *node, char *name, char *value);
+long	ft_atol(char *s);
+int	is_num(char *s);
 
 int		parse(t_shell *shell);
 t_token	*tokenize(t_shell *shell);

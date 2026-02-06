@@ -77,9 +77,13 @@ int	free_env_list(t_env *head)
 
 int	add_env_var(t_shell *shell, t_env *node, char *name, char *value)
 {
+	if (node->name != NULL)
+		free(node->name);
 	node->name = ft_strdup(name);
 	if (node->name == NULL)
 		return (1);
+	if (node->value != NULL)
+		free(node->value);
 	node->value = ft_strdup(value);
 	if (node->value == NULL)
 		return (1);

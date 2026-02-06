@@ -19,10 +19,14 @@
 void	full_exit(t_shell *shell)
 {
 	rl_clear_history();
-	free(shell->arena);
-	free_env(&shell->env);
-	free(shell->line);
-	free(shell);
+	if (shell->arena)
+		free(shell->arena);
+	if (shell->env)
+		free_env(&shell->env);
+	if (shell->line)
+		free(shell->line);
+	if (shell)
+		free(shell);
 }
 
 t_shell	*init_shell(t_shell *shell, char **envp)
@@ -79,6 +83,47 @@ char	*read_line_input(t_shell *shell, char *prev_line)
 	return (line);
 }
 
+t_env	*find_node(t_env *env)
+{
+	t_env	*last;
+
+	while (env != NULL)
+	{
+		last = env;
+		if (env->name != NULL && ft_strcmp(env->name, "SHLVL") == 0)
+			return (env);
+		env = env->next;
+	}
+	return (last);
+}
+
+int	set_shlvl(t_shell *shell)
+{
+	t_env	*shlvl_node;
+	char	*shlvl;
+	int		shlvl_int;
+
+	shlvl = getenv("SHLVL");
+	shlvl_node = find_node(shell->env);
+	if (shlvl == NULL || is_num(shlvl) == 0)
+		return (add_env_var(shell, shlvl_node, "SHLVL", "1"));
+	if (ft_strcmp(shlvl, "-1") == 0)
+		return (add_env_var(shell, shlvl_node, "SHLVL", "0"));
+	shlvl_int = ft_atol(shlvl);
+	if (shlvl_int == -1)
+		return (add_env_var(shell, shlvl_node, "SHLVL", "1"));
+	if (shlvl_int < 0)
+		return (add_env_var(shell, shlvl_node, "SHLVL", "0"));
+	else
+	{
+		shlvl = ft_itoa(++shlvl_int);
+		add_env_var(shell, shlvl_node, "SHLVL", shlvl);
+		free(shlvl);
+		return (0);
+	}
+	return (0);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	t_shell	*shell;
@@ -93,6 +138,11 @@ int	main(int ac, char **av, char **envp)
 		shell->is_interactive = 0;
 	setup_signals(shell);
 	rl_event_hook = rl_ev_hook;
+	if (set_shlvl(shell) == 1)
+	{
+		full_exit(shell);
+		exit(1);
+	}
 	while (true)
 	{
 		shell->line = read_line_input(shell, shell->line);
