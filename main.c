@@ -102,6 +102,7 @@ int	set_shlvl(t_shell *shell)
 	t_env	*shlvl_node;
 	char	*shlvl;
 	int		shlvl_int;
+	int		tmp;
 
 	shlvl = getenv("SHLVL");
 	shlvl_node = find_node(shell->env);
@@ -117,7 +118,8 @@ int	set_shlvl(t_shell *shell)
 	else
 	{
 		shlvl = ft_itoa(++shlvl_int);
-		return (free(shlvl), add_env_var(shell, shlvl_node, "SHLVL", shlvl));
+		tmp = add_env_var(shell, shlvl_node, "SHLVL", shlvl);
+		return (free(shlvl), tmp);
 	}
 	return (0);
 }

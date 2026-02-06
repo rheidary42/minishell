@@ -27,7 +27,7 @@ int	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 	t_redir	*r;
 
 	r = redirection;
-	while (r != NULL)
+	while (r != NULL && r->file != NULL)
 	{
 		if (r->type == TOKEN_REDIR_OUT)
 			exec->file_fd = open(r->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
