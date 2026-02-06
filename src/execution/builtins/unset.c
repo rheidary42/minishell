@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   unset.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/06 19:17:01 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/06 19:17:03 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	is_valid_id(char *str)
@@ -31,7 +43,7 @@ void	del_node(t_env *env, char *str)
 			free(curr->name);
 			free(curr->value);
 			free(curr);
-			return;
+			return ;
 		}
 		prev = curr;
 		curr = curr->next;

@@ -70,7 +70,7 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	}
 	if ((builtin_id = is_builtin(cmd->argv[0])) >= 0)
 	{
-		shell->last_exit_status = exec_builtin(shell, cmd, envp, shell->env, builtin_id);
+		shell->last_exit_status = exec_builtin(shell, cmd, shell->env, builtin_id);
 		free_and_close(shell, cmd, exec);
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
@@ -188,7 +188,7 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 			return (cleanup(save_stdin, save_stdout));
 		if (apply_redir(shell, cmd, cmd->redir, exec) == 1)
 			return (cleanup(save_stdin, save_stdout));
-		shell->last_exit_status = exec_builtin(shell, cmd, convert_envp(shell),
+		shell->last_exit_status = exec_builtin(shell, cmd,
 							shell->env, builtin_id);
 		cleanup(save_stdin, save_stdout);
 		return (shell->last_exit_status);

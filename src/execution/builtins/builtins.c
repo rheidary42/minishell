@@ -1,8 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtins.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/06 19:47:26 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/06 19:47:27 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-// Minimal stub for builtins to allow linking during development.
-// Replace with real builtin implementations later.
-int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id)
+int	exec_builtin(t_shell *shell, t_cmd *cmd, t_env *env, int builtin_id)
 {
 	setup_signals(shell);
 	if (builtin_id == EECHO)

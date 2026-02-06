@@ -1,9 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/06 19:42:40 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/06 19:44:32 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int validate_id(char *s)
+int	validate_id(char *s)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	if (!s || s[0] == '=')
 		return (0);
 	if (!ft_isalpha(s[0]) && s[0] != '_')
@@ -17,7 +30,6 @@ int validate_id(char *s)
 	}
 	return (1);
 }
-
 
 void	just_export(t_env *env)
 {
@@ -36,26 +48,25 @@ void	just_export(t_env *env)
 			write(STDOUT_FILENO, "\n", 1);
 		}
 		env = env->next;
-	}	
+	}
 }
 
 int	new_var(t_env *env, char *var)
 {
-    t_env *new_node;
-    t_env *tmp;
+	t_env	*new_node;
+	t_env	*tmp;
 
 	tmp = env;
 	new_node = ft_calloc(1, sizeof(t_env));
-    if (new_node == NULL)
-        return (1);
-    if (copy_var(new_node, var) == 0)
-        return (1);
-    while (tmp->next != NULL)
-        tmp = tmp->next;
-    tmp->next = new_node;
-    return (0);
+	if (new_node == NULL)
+		return (1);
+	if (copy_var(new_node, var) == 0)
+		return (1);
+	while (tmp->next != NULL)
+		tmp = tmp->next;
+	tmp->next = new_node;
+	return (0);
 }
-
 
 int	process_var(t_env *env, char *var)
 {
@@ -68,9 +79,9 @@ int	process_var(t_env *env, char *var)
 		id_len++;
 	while (curr != NULL)
 	{
-		if (ft_strlen(curr->name) == id_len && !ft_strncmp(curr->name, var, id_len))
-			break;
-		curr = curr->next;	
+		if (ft_strcmp(curr->name, var) == 0)
+			break ;
+		curr = curr->next;
 	}
 	if (curr == NULL)
 		return (new_var(env, var));
@@ -100,8 +111,9 @@ int	ft_export(t_shell *shell, t_env *env, t_cmd *cmd)
 			write(STDERR_FILENO, "export: `", 9);
 			write(STDERR_FILENO, cmd->argv[i], ft_strlen(cmd->argv[i]));
 			write(STDERR_FILENO, "': not a valid identifier\n", 26);
+			shell->last_exit_status = 1;
 			i++;
-			continue;
+			continue ;
 		}
 		if (process_var(env, cmd->argv[i]) == 1)
 		{
@@ -109,5 +121,5 @@ int	ft_export(t_shell *shell, t_env *env, t_cmd *cmd)
 		}
 		i++;
 	}
-	return (0);
+	return (shell->last_exit_status);
 }

@@ -117,9 +117,7 @@ int	set_shlvl(t_shell *shell)
 	else
 	{
 		shlvl = ft_itoa(++shlvl_int);
-		add_env_var(shell, shlvl_node, "SHLVL", shlvl);
-		free(shlvl);
-		return (0);
+		return (free(shlvl), add_env_var(shell, shlvl_node, "SHLVL", shlvl));
 	}
 	return (0);
 }

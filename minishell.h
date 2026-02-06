@@ -173,6 +173,8 @@ char	**split(t_shell *shell);
 int	add_env_var(t_shell *shell, t_env *node, char *name, char *value);
 long	ft_atol(char *s);
 int	is_num(char *s);
+void	cleanup_and_exit(t_shell *shell, int exit_code);
+void	handle_exit_error(t_shell *shell, char *arg, char *s);
 
 int		parse(t_shell *shell);
 t_token	*tokenize(t_shell *shell);
@@ -222,7 +224,7 @@ int	handle_heredoc(t_shell *shell, char *delim);
 int	heredoc_collector(t_shell *shell);
 
 // Placeholder for built-in execution function
-int	exec_builtin(t_shell *shell, t_cmd *cmd, char **envp, t_env *env, int builtin_id);
+int	exec_builtin(t_shell *shell, t_cmd *cmd, t_env *env, int builtin_id);
 int	ft_echo(t_cmd *cmd);
 int	ft_env(t_env *env);
 int	ft_pwd(void);

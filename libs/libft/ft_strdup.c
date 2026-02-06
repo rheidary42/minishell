@@ -34,6 +34,8 @@ char	*ft_strdup(const char *s)
 	if (!s)
 		return (NULL);
 	dup_str = ft_calloc(1, (ft_strlen(s) + 1));
+	if (dup_str == NULL)
+		return (NULL);
 	s_cast = (char *)s;
 	dup_str = ft_strcpy(dup_str, s_cast);
 	return (dup_str);
