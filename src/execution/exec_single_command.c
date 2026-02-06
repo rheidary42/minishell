@@ -134,10 +134,20 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	return (shell->last_exit_status);
 }
 
+void	restore_std(int sin, int sout)
+{
+	dup2(sin, STDIN_FILENO);
+	dup2(sout, STDOUT_FILENO);
+	close(sin);
+	close(sout);
+}
+
 int	exec_single_cmd(t_shell *shell, t_exec *exec)
 {
 	t_cmd	*cmd;
 	int		builtin_id;
+	int		save_stdin;
+	int		save_stdout;
 
 	cmd = shell->cmds;
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
@@ -154,9 +164,13 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 	builtin_id = is_builtin(cmd->argv[0]);
 	if (builtin_id >= 0)
 	{
+		save_stdin = dup(STDIN_FILENO);
+		save_stdout = dup(STDOUT_FILENO);
+		apply_redir(shell, cmd, cmd->redir, exec);
 		shell->last_exit_status = exec_builtin(shell, cmd, convert_envp(shell),
 							shell->env, builtin_id);
-			return (shell->last_exit_status);
+		restore_std(save_stdin, save_stdout);
+		return (shell->last_exit_status);
 	}
 	return (exec_in_child(shell, cmd, exec));
 }
