@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-volatile sig_atomic_t	g_sig = 0;
-
 void	sig_err_msg(t_shell *shell, int sig_num)
 {
 	if (sig_num == SIGINT)

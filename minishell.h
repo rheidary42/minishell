@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/08 06:10:15 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/08 06:11:31 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -60,11 +72,11 @@ typedef t_i32		t_b32;
 
 typedef struct s_struct
 {
-	 t_u64	capacity;
-	 t_u64	pos;
-}	 t_mem_arena;
+	t_u64	capacity;
+	t_u64	pos;
+}	t_mem_arena;
 
-extern volatile sig_atomic_t	g_sig;
+volatile sig_atomic_t	g_sig = 0;
 
 typedef struct s_pos
 {
@@ -81,111 +93,111 @@ typedef enum e_quote
 
 typedef enum e_toktype
 {
-    TOKEN_WORD,        // command or argument
-    TOKEN_PIPE,        // |
-    TOKEN_REDIR_IN,    // <
-    TOKEN_REDIR_OUT,   // >
-    TOKEN_APPEND,      // >>
-    TOKEN_HEREDOC,     // <<
-}   t_toktype;
+	TOKEN_WORD,
+	TOKEN_PIPE,
+	TOKEN_REDIR_IN,
+	TOKEN_REDIR_OUT,
+	TOKEN_APPEND,
+	TOKEN_HEREDOC,
+}	t_toktype;
 
 typedef enum e_builtins
 {
-    EECHO,          //EECHO because ECHO already exists
-    CD,
-    PWD,
-    EXPORT,
-    UNSET,
-    ENV,
-    EXIT,
-}   t_builtins;
+	EECHO,//EECHO because ECHO already exists
+	CD,
+	PWD,
+	EXPORT,
+	UNSET,
+	ENV,
+	EXIT,
+}	t_builtins;
 
 typedef struct s_token
 {
-    t_toktype       type;
-    char            *value;
+	t_toktype		type;
+	char			*value;
 	char			*expanded;
 	bool			*ws_mask;
 	bool			is_expanded;
-    bool            was_quoted;
-    struct s_token  *next;
-    struct s_token  *prev;
-}   t_token;
+	bool			was_quoted;
+	struct s_token	*next;
+	struct s_token	*prev;
+}	t_token;
 
 typedef struct s_redir
 {
-    struct s_redir  *next;
-    struct s_redir  *prev;
-	t_toktype       type;
-	char            *file;
-    int             heredoc_fd;
-    bool            was_quoted;
+	struct s_redir	*next;
+	struct s_redir	*prev;
+	t_toktype		type;
+	char			*file;
+	int				heredoc_fd;
+	bool			was_quoted;
 }	t_redir;
 
-typedef struct  s_env
+typedef struct s_env
 {
-    char    		*name;
-    char    		*value;
-    bool            exported;
-    struct s_env	*next;
-}   t_env;
+	char			*name;
+	char			*value;
+	bool			exported;
+	struct s_env	*next;
+}	t_env;
 
 typedef struct s_cmd
 {
-	char	**argv;
-	t_redir	*redir;
-    char    *redir_output; // for execution later
-	int		redir_count;
-    struct  s_cmd   *next;
+	char			**argv;
+	t_redir			*redir;
+	char			*redir_output; // for execution later
+	int				redir_count;
+	struct s_cmd	*next;
 }	t_cmd;
 
 typedef struct s_shell
 {
-    t_cmd   *cmds;
-    t_token *tokens;
-    t_env   *env;
-    char    *line;
-    bool    is_interactive;
-    int     last_exit_status;
-    int     shlvl;
-    t_mem_arena *arena;
-}   t_shell;
+	t_cmd		*cmds;
+	t_token		*tokens;
+	t_env		*env;
+	char		*line;
+	bool		is_interactive;
+	int			last_exit_status;
+	int			shlvl;
+	t_mem_arena	*arena;
+}	t_shell;
 
-typedef struct  s_exec
+typedef struct s_exec
 {
-    char    **all_paths;
-    char    *paths_from_env;
-    char    *final_path;
-    int     pipe_fds[2];
-    int     prev_fd;
-    int     file_fd;
-    int     sig_flag;
-    int     errno_save;
-    pid_t   child;
-    pid_t   last_child;
-}   t_exec;
+	char	**all_paths;
+	char	*paths_from_env;
+	char	*final_path;
+	int		pipe_fds[2];
+	int		prev_fd;
+	int		file_fd;
+	int		sig_flag;
+	int		errno_save;
+	pid_t	child;
+	pid_t	last_child;
+}	t_exec;
 
 /*          EXECUTION           */
 //  execution.c
-int	execution(t_shell *shell);
+int		execution(t_shell *shell);
 void	path_lookup(char *cmd_name, t_shell *shell, t_exec *exec);
 
 //  exec_single_command.c
-int	exec_single_cmd(t_shell *shell, t_exec *exec);
-int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
+int		exec_single_cmd(t_shell *shell, t_exec *exec);
+int		exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec);
-int	apply_redir(t_shell *shell, t_redir *redirection, t_exec *exec);
-int	consume_redirs_only(t_redir *redir);
+int		apply_redir(t_shell *shell, t_redir *redirection, t_exec *exec);
+int		consume_redirs_only(t_redir *redir);
 
 // exec_single_command_helper.c
-int	set_exit_status(t_shell *shell);
+int		set_exit_status(t_shell *shell);
 char	**set_envp(t_shell *shell, t_cmd *cmd, t_exec *exec, int *builtin_id);
 void	no_final_path(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void	read_errno(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void	detect_signals(t_shell *shell, int status);
 
 //  exec_pipeline.c
-int	build_pipeline(t_shell *shell, t_exec *exec);
+int		build_pipeline(t_shell *shell, t_exec *exec);
 void	exec_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void	wait_for_children(t_shell *shell, t_exec *exec);
 void	redirection(t_exec *exec);
@@ -195,7 +207,7 @@ void	fork_failure(t_shell *shell, t_cmd *cmd, t_exec *exec);
 char	*check_executable(char **all_paths, char *cmd_name, t_shell *shell);
 char	**split_paths(char *paths_from_env, t_shell *shell);
 char	*split_paths_helper(t_shell *shell, char *paths, int *e, int *s);
-int	count_path(char *paths_from_env);
+int		count_path(char *paths_from_env);
 char	*get_paths_from_env(t_env *env);
 
 //  exec_helper.c
@@ -206,61 +218,61 @@ void	initialise_exec(t_exec *exec);
 
 /*          BUILTINS           */
 //  builtins.c
-int	is_builtin(char *cmd);
-int	exec_builtin(t_shell *shell, t_cmd *cmd, t_env *env, int builtin_id);
+int		is_builtin(char *cmd);
+int		exec_builtin(t_shell *shell, t_cmd *cmd, t_env *env, int builtin_id);
 
 //  cd.c
-int	ft_cd(t_env *env, t_cmd *cmd);
-int	solo_cd(t_env *env);
-int	update_pwd(t_env *env, char *oldpwd, char *pwd);
+int		ft_cd(t_env *env, t_cmd *cmd);
+int		solo_cd(t_env *env);
+int		update_pwd(t_env *env, char *oldpwd, char *pwd);
 
 //  echo.c
-int	ft_echo(t_cmd *cmd);
+int		ft_echo(t_cmd *cmd);
 bool	is_flag(char *str);
 
 //  env.c
-int	ft_env(t_env *env);
+int		ft_env(t_env *env);
 
 //  exit.c
-int	ft_exit(t_shell *shell, t_cmd *cmd);
+int		ft_exit(t_shell *shell, t_cmd *cmd);
 void	handle_single_arg(t_shell *shell, t_cmd *cmd, char *s);
 
 //  exit_helper.c
 void	handle_exit_error(t_shell *shell, char *arg, char *s);
 void	cleanup_and_exit(t_shell *shell, int exit_code);
 long	ft_atol(char *s);
-int	is_num(char *s);
+int		is_num(char *s);
 
 //  export.c
-int	ft_export(t_shell *shell, t_env *env, t_cmd *cmd);
-int	process_var(t_env *env, char *var);
-int	new_var(t_env *env, char *var);
+int		ft_export(t_shell *shell, t_env *env, t_cmd *cmd);
+int		process_var(t_env *env, char *var);
+int		new_var(t_env *env, char *var);
 void	just_export(t_env *env);
-int	validate_id(char *s);
+int		validate_id(char *s);
 
 //  pwd.c
-int	ft_pwd(void);
+int		ft_pwd(void);
 
 //  unset.c
-int	ft_unset(t_env *env, t_cmd *cmd);
+int		ft_unset(t_env *env, t_cmd *cmd);
 void	del_node(t_env *env, char *str);
-int	is_valid_id(char *str);
+int		is_valid_id(char *str);
 
 /*          ENVIRONMENT         */
 //  convert_envp.c
 char	**convert_envp(t_shell *shell);
-int	env_list_size(t_env *env);
+int		env_list_size(t_env *env);
 
 //  envp.c
-int	copy_envp(t_shell *shell, t_env *copy_env, char **curr_env);
-int	make_envp(t_shell *shell, t_env *copy_env);
-int	add_env_var(t_shell *shell, t_env *node, char *name, char *value);
-int	copy_var(t_env *env, char *str);
+int		copy_envp(t_shell *shell, t_env *copy_env, char **curr_env);
+int		make_envp(t_shell *shell, t_env *copy_env);
+int		add_env_var(t_shell *shell, t_env *node, char *name, char *value);
+int		copy_var(t_env *env, char *str);
 size_t	strlen_delim(char *str, char delim);
 
 //  shlvl.c
 void	signal_and_shlvl(t_shell *shell);
-int	set_shlvl(t_shell *shell);
+int		set_shlvl(t_shell *shell);
 t_env	*find_node(t_env *env);
 
 /*          MEMORY          */
@@ -269,7 +281,7 @@ void	arena_clear(t_mem_arena *arena);
 void	arena_pop_to(t_mem_arena *arena, t_u64 pos);
 void	arena_pop(t_mem_arena *arena, t_u64 size);
 void	*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero,
-	t_shell *shell);
+			t_shell *shell);
 t_mem_arena	*arena_create(t_u64 capacity);
 
 //  cleanup.c
@@ -281,30 +293,30 @@ void	clean_up(t_shell *shell);
 
 /*          MISC            */
 //  heredoc.c
-int	heredoc_collector(t_shell *shell);
-int	init_heredoc(t_shell *shell, t_redir *r);
-int	run_heredoc(t_shell *shell, char *tmp_file, char *delim, bool was_q);
+int		heredoc_collector(t_shell *shell);
+int		init_heredoc(t_shell *shell, t_redir *r);
+int		run_heredoc(t_shell *shell, char *tmp_file, char *delim, bool was_q);
 char	*heredoc_expander(t_shell *shell, char *line);
 
 //  heredoc_expander.c
-int	expand_var(t_shell *shell, char *exp_line, char *line, int *exp_i);
+int		expand_var(t_shell *shell, char *exp_line, char *line, int *exp_i);
 void	copy_exit_code(t_shell *shell, char *exp_line, int *exp_i);
-int	full_line_len(t_shell *shell, char *line);
+int		full_line_len(t_shell *shell, char *line);
 char	*var_name(t_shell *shell, char *s);
-int	var_len(char *s);
+int		var_len(char *s);
 
 //  heredoc_helper.c
 char	*get_here_doc_name(t_shell *shell);
 void	handle_exp(t_shell *shell, char *line, int fd);
 char	*gnl_mode(void);
-int	handle_sigint(char *line, int fd);
-int	handle_eof(char *line, char *delim);
+int		handle_sigint(char *line, int fd);
+int		handle_eof(char *line, char *delim);
 
 //  signals.c
 void	setup_signals(t_shell *shell);
 void	setup_prompt_signals(void);
 void	setup_noninteractive_signals(void);
-int	rl_ev_hook(void);
+int		rl_ev_hook(void);
 void	sig_err_msg(t_shell *shell, int sig_num);
 
 //  signal_handler.c
@@ -318,33 +330,33 @@ void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell);
 void	build_commands(t_shell *shell);
 
 //  build_commands_helper.c
-int	count_argc(t_token *tokens);
+int		count_argc(t_token *tokens);
 void	finish_argv(t_cmd **cmd, int *i);
 bool	is_redir(t_token *token);
 bool	is_argv(t_token *token);
 
 //  parse.c
-int	parse(t_shell *shell);
+int		parse(t_shell *shell);
 t_token	*tokenize(t_shell *shell);
 
 //  split.c
 char	**split(t_shell *shell);
-int	count_tokens(char *str);
-int	token_len(char *str);
-int	is_delim(char *str);
+int		count_tokens(char *str);
+int		token_len(char *str);
+int		is_delim(char *str);
 void	handle_quote(char *str, int *len);
 
 //  token_list.c
 void	build_token_list(t_shell *shell, char **arr);
 t_token	*new_node(char *str, t_shell *shell);
-t_toktype	token_type(char *str);
+t_toktypetoken_type(char *str);
 void	append_node(t_shell *shell, t_token *new);
 
 //  validate_tokens.c
-int	validate_tokens(t_token *tokens);
-int	is_unclosed_quote(char *str);
-int	is_pipe(t_token *token);
-int	is_redir2(t_token *tok);
+int		validate_tokens(t_token *tokens);
+int		is_unclosed_quote(char *str);
+int		is_pipe(t_token *token);
+int		is_redir2(t_token *tok);
 
 /*          EXPANSION           */
 //  quote.c
@@ -354,7 +366,7 @@ void	quote_removal(t_shell *shell);
 
 // word.c
 t_token	*split_token_segments(t_token *token, t_shell *shell,
-		t_token *first, t_token *prev);
+			t_token *first, t_token *prev);
 void	split_value(t_token *token, t_shell *shell);
 bool	is_whitespace_token(t_token *curr);
 void	word(t_shell *shell);
@@ -362,15 +374,15 @@ void	word(t_shell *shell);
 // word2.c
 bool	is_ifs(char c);
 bool	needs_splitting(t_token *curr);
-int	calc_token_size(t_token *token, int *index);
+int		calc_token_size(t_token *token, int *index);
 t_token	*make_base_token(t_token *src, int start, int len, t_shell *shell);
 void	splice_token(t_token *old, t_token *first, t_token *last,
-		t_shell *shell);
+			t_shell *shell);
 
 // word3.c
 void	generate_base_tokens(t_token *curr, t_shell *shell);
 t_token	*make_split_token(t_token *src, int start, int len, t_shell *shell);
-int	next_split_length(char *str);
+int		next_split_length(char *str);
 
 /*          PARAMETER           */
 //  expansion_core.c
@@ -384,7 +396,7 @@ void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell);
 
 //  expansion_size.c
 size_t	calc_expanded_size(char *value, t_shell *shell);
-int	needs_expansions(t_token *token);
+int		needs_expansions(t_token *token);
 
 //  expansion_var.c
 char	*get_var_value(char *var_name, t_shell *shell);
@@ -394,8 +406,8 @@ size_t	get_var_len(char *value, int *var_start, t_shell *shell);
 //  param_helper.c
 char	*ft_strcpy(char *dest, char *src);
 void	update_quote_state(char c, t_quote *quote_state);
-int	is_expandable_var(char *value, size_t index, t_quote in_quote);
-int	ifs(char c);
+int		is_expandable_var(char *value, size_t index, t_quote in_quote);
+int		ifs(char c);
 size_t	exit_status_len(int i);
 
 // FIX LATER

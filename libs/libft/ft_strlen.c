@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:28:07 by rheidary          #+#    #+#             */
-/*   Updated: 2026/02/03 13:04:20 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/08 06:13:06 by boenkhja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 size_t	ft_strlen(const char *s)
 {
 	int	i;
+
 	if (!s)
 		return (0);
 	i = 0;
