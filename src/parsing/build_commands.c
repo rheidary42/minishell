@@ -18,31 +18,18 @@ also refactored ft_strdup to use safe_calloc as well*/
 
 #include "minishell.h"
 
-int	count_argc(t_token *tokens)
-{
-	int	count;
-
-	count = 0;
-	while (tokens != NULL && tokens->type != TOKEN_PIPE)
-	{
-		if (tokens->type == TOKEN_WORD)
-			count++;
-		tokens = tokens->next;
-	}
-	return (count);
-}
-
-t_cmd	*create_append(t_shell *shell, t_token *curr_token)
+t_cmd	*create_append(t_shell *shell, t_token *curr_token, int *i)
 {
 	t_cmd	*new;
 	t_cmd	*curr;
 
 	new = (t_cmd *)arena_push(shell->arena, sizeof(t_cmd), 0, shell);
+	*i = 0;
 	if (shell->cmds == NULL)
 	{
 		shell->cmds = new;
-		new->argv = (char **)arena_push(shell->arena, (count_argc(curr_token) + 1)
-				* sizeof(char *), 0, shell);
+		new->argv = (char **)arena_push(shell->arena,
+				(count_argc(curr_token) + 1) * sizeof(char *), 0, shell);
 		return (new);
 	}
 	curr = shell->cmds;
@@ -54,32 +41,15 @@ t_cmd	*create_append(t_shell *shell, t_token *curr_token)
 	return (new);
 }
 
-bool	is_redir(t_token *token)
-{
-	if (token->type == TOKEN_REDIR_IN || token->type == TOKEN_REDIR_OUT
-		|| token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC)
-	{
-		return (true);
-	}
-	return (false);
-}
-
-bool	is_argv(t_token *token)
-{
-	if (token->prev == NULL || is_redir(token->prev) == false)
-		return (true);
-	return (false);
-}
-
 void	append_redir(t_cmd *cmd, t_token *token, t_shell *shell)
 {
 	t_redir	*redirection;
 	t_redir	*curr;
 
-	redirection = (t_redir *)arena_push(shell->arena, sizeof(t_redir), 0, shell);
-	if (redirection == NULL)
-		return ; // TO DO ERROR
+	redirection = (t_redir *)arena_push(shell->arena,
+			sizeof(t_redir), 0, shell);
 	redirection->type = token->type;
+	redirection->was_quoted = token->next->was_quoted;
 	redirection->file = (char *)arena_push(shell->arena,
 			ft_strlen(token->next->value) + 1, 0, shell);
 	ft_strlcpy(redirection->file, token->next->value,
@@ -104,10 +74,10 @@ void	handle_redir(t_cmd *curr_cmd, t_token **curr_token_ptr, t_shell *shell)
 
 	curr_token = *curr_token_ptr;
 	if (curr_token->next != NULL && curr_token->next->type == TOKEN_WORD)
-		{
-			append_redir(curr_cmd, curr_token, shell);
-			*curr_token_ptr = curr_token->next;
-		}
+	{
+		append_redir(curr_cmd, curr_token, shell);
+		*curr_token_ptr = curr_token->next;
+	}
 }
 
 void	build_commands(t_shell *shell)
@@ -122,24 +92,19 @@ void	build_commands(t_shell *shell)
 	while (curr != NULL)
 	{
 		if (cmd == NULL)
-		{
-			cmd = create_append(shell, curr);
-			i = 0;
-		}
+			cmd = create_append(shell, curr, &i);
 		if (is_redir(curr) == true)
 			handle_redir(cmd, &curr, shell);
-		else if (curr->type == TOKEN_WORD && is_argv(curr) == true && curr->is_expanded == false)
+		else if (curr->type == TOKEN_WORD && is_argv(curr) == true
+			&& curr->is_expanded == false)
 			cmd->argv[i++] = curr->value;
-		else if (curr->type == TOKEN_WORD && is_argv(curr) == true && curr->is_expanded == true)
+		else if (curr->type == TOKEN_WORD && is_argv(curr) == true
+			&& curr->is_expanded == true)
 			cmd->argv[i++] = curr->expanded;
 		else if (curr->type == TOKEN_PIPE)
-		{
-			if (cmd != NULL)
-				cmd->argv[i] = NULL;
-			cmd = NULL;
-		}
+			finish_argv(&cmd, &i);
 		curr = curr->next;
 	}
 	if (cmd != NULL)
-		cmd->argv[i] = NULL; // FOR THE LAST COMMANDS ARGV ARRAY
+		cmd->argv[i] = NULL;
 }

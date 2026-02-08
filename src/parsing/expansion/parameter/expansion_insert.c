@@ -12,18 +12,15 @@
 
 #include "minishell.h"
 
-void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell,
-			t_quote *quote_state)
+void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell)
 {
 	char	*exit_status;
-	char	*dest;
 	int		exit_len;
 	int		i;
 
 	exit_status = ft_itoa(shell->last_exit_status);
 	if (exit_status == NULL)
-		clean_up(shell); // TO-DO handle better
-	dest = shell->tokens->expanded + pos->exp;
+		clean_up(shell);
 	exit_len = exit_status_len(shell->last_exit_status);
 	i = -1;
 	while (++i < exit_len)
@@ -45,11 +42,12 @@ void	handle_var(t_pos *pos, t_quote *quote_state,
 		pos->org++;
 	if (token->value[pos->org] == '?')
 	{
-		insert_exit_status(pos, token, shell, quote_state);
+		insert_exit_status(pos, token, shell);
 		pos->org++;
 		return ;
 	}
-	var_value = get_var_value(get_var_name(shell, token->value, &pos->org), shell);
+	var_value = get_var_value(get_var_name(shell,
+				token->value, &pos->org), shell);
 	if (!var_value)
 		return ;
 	j = 0;

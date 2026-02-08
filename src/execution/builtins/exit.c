@@ -19,10 +19,7 @@ void	handle_single_arg(t_shell *shell, t_cmd *cmd, char *s)
 
 	flag = 0;
 	if (ft_strcmp(cmd->argv[1], "-1") == 0)
-	{
-		exit_code = -1;
 		flag = 1;
-	}
 	exit_code = ft_atol(cmd->argv[1]);
 	if (exit_code == -1 && flag == 0)
 		handle_exit_error(shell, cmd->argv[1], s);
@@ -33,13 +30,11 @@ void	handle_single_arg(t_shell *shell, t_cmd *cmd, char *s)
 	}
 }
 
-int	ft_exit(t_shell *shell, t_cmd *cmd, t_env *env)
+int	ft_exit(t_shell *shell, t_cmd *cmd)
 {
 	char	*tmp;
 	int		exit_argc;
-	int		exit_code;
 
-	exit_code = 0;
 	exit_argc = 0;
 	while (cmd->argv[exit_argc + 1] != NULL)
 		exit_argc++;

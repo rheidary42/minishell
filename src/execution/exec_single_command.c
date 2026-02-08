@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_single_command.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/08 03:02:01 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/08 03:02:02 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int	consume_redirs_only(t_shell *shell, t_redir *redir)
+int	consume_redirs_only(t_redir *redir)
 {
 	int	fd;
 
@@ -22,7 +34,7 @@ int	consume_redirs_only(t_shell *shell, t_redir *redir)
 	return (0);
 }
 
-int	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
+int	apply_redir(t_shell *shell, t_redir *redirection, t_exec *exec)
 {
 	t_redir	*r;
 
@@ -37,10 +49,9 @@ int	apply_redir(t_shell *shell, t_cmd *cmd, t_redir *redirection, t_exec *exec)
 			exec->file_fd = open(r->file, O_RDONLY);
 		if (exec->file_fd == -1)
 		{
-			shell->last_exit_status = 1;
 			if (r && r->file)
 				perror(r->file);
-			return (1);
+			return (set_exit_status(shell));
 		}
 		if (r->type == TOKEN_REDIR_IN || r->type == TOKEN_HEREDOC)
 			dup2(exec->file_fd, STDIN_FILENO);
@@ -57,46 +68,28 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	char	**envp;
 	int		builtin_id;
 
-	if (apply_redir(shell, cmd, cmd->redir, exec) == 1)
-	{
-		shell->last_exit_status = 1;
+	if (apply_redir(shell, cmd->redir, exec) == 1)
 		free_and_close(shell, cmd, exec);
-	}
-	if ((envp = convert_envp(shell)) == NULL)
+	envp = set_envp(shell, cmd, exec, &builtin_id);
+	if (builtin_id >= 0)
 	{
-		printf("%s: 1heeeeeeeeeeeeere command not found\n", cmd->argv[0]);
-		shell->last_exit_status = 1;
-		free_and_close(shell, cmd, exec);
-	}
-	if ((builtin_id = is_builtin(cmd->argv[0])) >= 0)
-	{
-		shell->last_exit_status = exec_builtin(shell, cmd, shell->env, builtin_id);
+		exec_builtin(shell, cmd, shell->env, builtin_id);
 		free_and_close(shell, cmd, exec);
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
 	{
-		exec->final_path = (char *)arena_push(shell->arena, ft_strlen(cmd->argv[0]) + 1, 0, shell);
+		exec->final_path = (char *)arena_push(shell->arena,
+				ft_strlen(cmd->argv[0]) + 1, 0, shell);
 		ft_strlcpy(exec->final_path, cmd->argv[0], ft_strlen(cmd->argv[0]) + 1);
-		free_env_list(shell->env);
+		free_env(&shell->env);
 	}
 	else
 		path_lookup(cmd->argv[0], shell, exec);
 	if (exec->final_path == NULL)
-	{
-		write(STDERR_FILENO, cmd->argv[0], ft_strlen(cmd->argv[0]));
-		write(STDERR_FILENO, ": command not found\n", 21);
-		shell->last_exit_status = 127;
-		free_and_close(shell, cmd, exec);
-	}
+		no_final_path(shell, cmd, exec);
 	execve(exec->final_path, cmd->argv, envp);
 	exec->errno_save = errno;
-	perror(cmd->argv[0]);
-	free(shell->arena);
-	if (exec->errno_save == EACCES)
-		shell->last_exit_status = 126;
-	else
-		shell->last_exit_status = 127;
-	free_and_close(shell, cmd, exec);
+	read_errno(shell, cmd, exec);
 }
 
 int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
@@ -106,10 +99,7 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	status = 0;
 	exec->child = fork();
 	if (exec->child == -1)
-	{
-		perror("fork failure");
-		return (1);
-	}
+		fork_failure(shell, cmd, exec);
 	if (exec->child == 0)
 	{
 		signal(SIGINT, SIG_DFL);
@@ -123,56 +113,21 @@ int	exec_in_child(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	if (WIFEXITED(status) != 0)
 		shell->last_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status) != 0)
-	{
-		int gl_sig = WTERMSIG(status);
-		if (gl_sig == SIGINT)
-		{
-			write(1, "\n", 1);
-		}
-		if (gl_sig == SIGQUIT)
-		{
-			write(1, "Quit (core dumped)\n", 20);
-		}
-		shell->last_exit_status = 128 + gl_sig;
-	}
+		detect_signals(shell, status);
 	return (shell->last_exit_status);
-}
-
-void	restore_std(int sin, int sout)
-{
-	dup2(sin, STDIN_FILENO);
-	dup2(sout, STDOUT_FILENO);
-	close(sin);
-	close(sout);
-}
-
-int	cleanup(int sin, int soul)
-{
-	if (sin != -1 && soul != -1)
-		restore_std(sin, soul);
-	else
-	{
-		if (sin != -1)
-			close(sin);
-		if (soul != -1)
-			close(soul);
-	}
-	return (1);
 }
 
 int	exec_single_cmd(t_shell *shell, t_exec *exec)
 {
 	t_cmd	*cmd;
 	int		builtin_id;
-	int		save_stdin;
-	int		save_stdout;
 
 	cmd = shell->cmds;
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 	{
 		if (cmd->redir != NULL)
 		{
-			if (consume_redirs_only(shell, cmd->redir) == -1)
+			if (consume_redirs_only(cmd->redir) == -1)
 				shell->last_exit_status = 1;
 			else
 				shell->last_exit_status = 0;
@@ -182,15 +137,10 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 	builtin_id = is_builtin(cmd->argv[0]);
 	if (builtin_id >= 0)
 	{
-		save_stdin = dup(STDIN_FILENO);
-		save_stdout = dup(STDOUT_FILENO);
-		if (save_stdin == -1 || save_stdout == -1)
-			return (cleanup(save_stdin, save_stdout));
-		if (apply_redir(shell, cmd, cmd->redir, exec) == 1)
-			return (cleanup(save_stdin, save_stdout));
+		if (apply_redir(shell, cmd->redir, exec) == 1)
+			free_and_close(shell, shell->cmds, exec);
 		shell->last_exit_status = exec_builtin(shell, cmd,
-							shell->env, builtin_id);
-		cleanup(save_stdin, save_stdout);
+				shell->env, builtin_id);
 		return (shell->last_exit_status);
 	}
 	return (exec_in_child(shell, cmd, exec));

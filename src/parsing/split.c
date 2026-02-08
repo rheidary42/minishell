@@ -75,26 +75,6 @@ int	count_tokens(char *str)
 	return (count);
 }
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	size_t	i = 0;
-
-	if (dst == NULL)
-		return (i);
-	if (dstsize)
-	{
-		while (src[i] && i < dstsize - 1)
-		{
-			dst[i] = src[i];
-			i++;
-		}
-		dst[i] = '\0';
-	}
-	while (src[i])
-		i++;
-	return (i);
-}
-
 char	**split(t_shell *shell)
 {
 	char	**arr;
@@ -115,8 +95,6 @@ char	**split(t_shell *shell)
 			j++;
 		len = token_len(&(shell->line[j]));
 		arr[i] = (char *)arena_push(shell->arena, len + 1, 0, shell);
-		if (!arr[i])
-			return (NULL);
 		ft_strlcpy(arr[i], &(shell->line[j]), len + 1);
 		j += len;
 		i++;
@@ -124,15 +102,3 @@ char	**split(t_shell *shell)
 	arr[tokens] = NULL;
 	return (arr);
 }
-
-// int	main(void)
-// {
-// 	t_shell *idk = calloc(sizeof(t_shell), 1);
-// 	idk->arena = arena_create(1000);
-// 	idk->line = "echo -n test1\t\ttest2";
-// 	char	**str = split(idk);
-
-// 	for (int i = 0; str[i]; i++)
-// 		printf("[%s]\n", str[i]);
-// 	return (0);
-// }

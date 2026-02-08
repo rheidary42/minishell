@@ -1,49 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_helper.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/08 01:06:23 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/08 01:06:25 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-
-void	free_func(char **to_free)
-{
-	int	i;
-
-	i = 0;
-	if (to_free == NULL)
-		return ;
-	while (to_free[i] != NULL)
-	{
-		free(to_free[i]);
-		i++;
-	}
-	free(to_free);
-}
-
-void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec)
-{
-	// No more freeing of arena-allocated memory
-	// Need Borkhuu to verify this
-	int	ret;
-	(void)shell;
-	(void)cmd;
-	// all_paths, argv, final_path are arena-allocated; no need to free them
-	ret = shell->last_exit_status;
-	if (exec->pipe_fds[0] != -1)
-	{
-		close(exec->pipe_fds[0]);
-		exec->pipe_fds[0] = -1;
-	}
-	if (exec->pipe_fds[1] != -1)
-	{
-		close(exec->pipe_fds[1]);
-		exec->pipe_fds[1] = -1;
-	}
-	if (exec->file_fd != -1)
-	{
-		close(exec->file_fd);
-		exec->file_fd = -1;
-	}
-	free(shell->arena);
-	free_env_list(shell->env);
-	free(shell);
-	exit(ret);
-}
 
 void	initialise_exec(t_exec *exec)
 {
@@ -68,6 +35,19 @@ bool	is_direct_path(char *executable)
 	return (false);
 }
 
+void	str_join3_helper(char *s1, char *s2)
+{
+	int	i;
+
+	i = 0;
+	while (s2[i] != '\0')
+	{
+		s1[i] = s2[i];
+		i++;
+	}
+	s1[i] = '\0';
+}
+
 char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell)
 {
 	char	*str_comb;
@@ -90,11 +70,6 @@ char	*str_join3(char *s1, char *s2, char *s3, t_shell *shell)
 		str_comb[a + b] = s2[b];
 		b++;
 	}
-	while (s3[c] != '\0')
-	{
-		str_comb[a + b + c] = s3[c];
-		c++;
-	}
-	str_comb[a + b + c] = '\0';
+	str_join3_helper(&str_comb[a + b], s3);
 	return (str_comb);
 }

@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-bool	needs_removal(t_token *token, t_shell *shell)
+bool	needs_removal(t_token *token)
 {
 	size_t	i;
 	char	*str;
@@ -67,7 +67,7 @@ void	quote_removal(t_shell *shell)
 	current = shell->tokens;
 	while (current != NULL)
 	{
-		if (needs_removal(current, shell) == true)
+		if (needs_removal(current) == true)
 		{
 			if (current->is_expanded == true)
 			{
@@ -79,6 +79,7 @@ void	quote_removal(t_shell *shell)
 				new_str = remove_quotes(current->value, shell);
 				current->value = new_str;
 			}
+			current->was_quoted = true;
 		}
 		current = current->next;
 	}

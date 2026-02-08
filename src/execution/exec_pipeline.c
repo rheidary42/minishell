@@ -1,4 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_pipeline.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/08 01:55:38 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/08 01:55:39 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
+
+void	fork_failure(t_shell *shell, t_cmd *cmd, t_exec *exec)
+{
+	perror("fork failed\n");
+	free_and_close(shell, cmd, exec);
+}
+
+void	redirection(t_exec *exec)
+{
+	close(exec->pipe_fds[1]);
+	exec->prev_fd = exec->pipe_fds[0];
+}
 
 void	wait_for_children(t_shell *shell, t_exec *exec)
 {
@@ -7,15 +31,14 @@ void	wait_for_children(t_shell *shell, t_exec *exec)
 	int		sig_num;
 
 	sig_num = 0;
-	temp_pid = 1;
 	while (1)
 	{
 		temp_pid = wait(&status);
 		if (temp_pid == -1)
 		{
 			if (errno == EINTR)
-				continue;
-			break;
+				continue ;
+			break ;
 		}
 		if (WIFSIGNALED(status) != 0)
 		{
@@ -23,7 +46,7 @@ void	wait_for_children(t_shell *shell, t_exec *exec)
 			exec->sig_flag = 1;
 		}
 		if (temp_pid == exec->last_child && WIFEXITED(status) != 0)
-				shell->last_exit_status = WEXITSTATUS(status);
+			shell->last_exit_status = WEXITSTATUS(status);
 	}
 	if (exec->sig_flag == 1)
 		sig_err_msg(shell, sig_num);
@@ -68,19 +91,16 @@ int	build_pipeline(t_shell *shell, t_exec *exec)
 	{
 		if (cmd->next != NULL)
 			if (pipe(exec->pipe_fds) == -1)
-				perror("pipe");
+				perror("pipe failed\n");
 		exec->child = fork();
 		if (exec->child == -1)
-			return (perror("fork"), 1);
+			fork_failure(shell, cmd, exec);
 		else if (exec->child == 0)
 			exec_cmd(shell, cmd, exec);
 		if (exec->prev_fd != -1)
 			close(exec->prev_fd);
 		if (cmd->next != NULL)
-		{
-			close(exec->pipe_fds[1]);
-			exec->prev_fd = exec->pipe_fds[0];
-		}
+			redirection(exec);
 		cmd = cmd->next;
 		exec->last_child = exec->child;
 	}

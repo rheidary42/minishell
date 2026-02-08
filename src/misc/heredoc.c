@@ -1,23 +1,48 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/08 03:38:46 by boenkhja          #+#    #+#             */
+/*   Updated: 2026/02/08 03:38:47 by boenkhja         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-char	*get_here_doc_name(t_shell *shell)
+char	*heredoc_expander(t_shell *shell, char *line)
 {
-	static int	heredoc_idx;
-	char		*idx_str;
-	char		*tmp_name;
+	char	*exp_line;
+	int		len;
+	int		exp_i;
+	int		i;
 
-	idx_str = ft_itoa(heredoc_idx++);
-	if (idx_str == NULL)
-		return (clean_up(shell), NULL);
-	tmp_name = str_join3("/tmp/heredoc_", "\0", idx_str, shell);
-	free(idx_str);
-	return (tmp_name);
+	len = full_line_len(shell, line);
+	exp_line = arena_push(shell->arena, (sizeof(char) * len) + 1, 0, shell);
+	exp_i = 0;
+	i = 0;
+	while (line != NULL && line[i] != '\0')
+	{
+		if (line[i] == '$' && line[i + 1] == '?')
+		{
+			copy_exit_code(shell, &exp_line[exp_i], &exp_i);
+			i++;
+		}
+		else if (line[i] == '$')
+		{
+			i += expand_var(shell, &exp_line[exp_i], &line[i + 1], &exp_i) + 1;
+		}
+		if (line[i] != '$' && line[i] != '\0')
+			exp_line[exp_i++] = line[i++];
+	}
+	return (exp_line);
 }
 
-int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
+int	run_heredoc(t_shell *shell, char *tmp_file, char *delim, bool was_q)
 {
 	char	*line;
-	char	*tmp;
 	int		fd;
 
 	fd = open(tmp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -28,40 +53,40 @@ int	run_heredoc(t_shell *shell, char *tmp_file, char *delim)
 		if (shell->is_interactive == true)
 			line = readline("> ");
 		else
-		{
-			tmp = get_next_line(fileno(stdin));
-			line = ft_strtrim(tmp, "\n");
-			free(tmp);
-		}
-		if (g_sig == SIGINT)
-		{
-			free(line);
-			close(fd);
+			line = gnl_mode();
+		if (handle_sigint(line, fd) == 130)
 			return (130);
-		}
-		if (line == NULL || ft_strcmp(line, delim) == 0)
-		{
-			if (line == NULL)
-			{
-				write(STDERR_FILENO, "warning: here-document delimited by end-of-file (wanted `", 58);
-				write(STDERR_FILENO, delim, ft_strlen(delim));
-				write(STDERR_FILENO, "')\n", 3);
-			}
-			free(line);
-			break;
-		}
-		write(fd, line, ft_strlen(line));
+		if (handle_eof(line, delim) == 1)
+			break ;
+		if (was_q == false)
+			handle_exp(shell, line, fd);
+		else
+			write(fd, line, ft_strlen(line));
 		write(fd, "\n", 1);
 		free(line);
 	}
 	return (close(fd), 0);
 }
 
+int	init_heredoc(t_shell *shell, t_redir *r)
+{
+	char	*tmp;
+
+	tmp = get_here_doc_name(shell);
+	if (run_heredoc(shell, tmp, r->file, r->was_quoted) == 130)
+	{
+		unlink(tmp);
+		setup_signals(shell);
+		return (1);
+	}
+	r->file = tmp;
+	return (0);
+}
+
 int	heredoc_collector(t_shell *shell)
 {
 	t_cmd	*cmd;
 	t_redir	*r;
-	char	*tmp;
 
 	setup_signals(shell);
 	cmd = shell->cmds;
@@ -72,15 +97,8 @@ int	heredoc_collector(t_shell *shell)
 		{
 			if (r->type == TOKEN_HEREDOC)
 			{
-				tmp = get_here_doc_name(shell);
-				if (run_heredoc(shell, tmp, r->file) == 130)
-				{
-					unlink(tmp);
-					// free(tmp);
-					setup_signals(shell);
+				if (init_heredoc(shell, r) == 1)
 					return (1);
-				}
-				r->file = tmp; // arena free?
 			}
 			r = r->next;
 		}

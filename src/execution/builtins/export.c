@@ -16,7 +16,6 @@ int	validate_id(char *s)
 {
 	int	i;
 
-	i = 0;
 	if (!s || s[0] == '=')
 		return (0);
 	if (!ft_isalpha(s[0]) && s[0] != '_')

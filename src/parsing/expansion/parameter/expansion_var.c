@@ -49,7 +49,8 @@ char	*get_var_name(t_shell *shell, char *value, size_t *var_start)
 	var_end = *var_start;
 	while (value[var_end] && (ft_isalnum(value[var_end])) != 0)
 		var_end++;
-	var_name = (char *)arena_push(shell->arena, var_end - *var_start + 1, 0, shell);
+	var_name = (char *)arena_push(shell->arena,
+			var_end - *var_start + 1, 0, shell);
 	ft_strlcpy(var_name, value + *var_start, var_end - *var_start + 1);
 	*var_start = var_end;
 	return (var_name);

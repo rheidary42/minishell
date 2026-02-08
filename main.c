@@ -12,23 +12,6 @@
 
 #include "minishell.h"
 
-// ! Handle itoa failure in all cases in better way -> potentioally remake itoa to use arena
-// ! Handle readline failure
-// ! Handle syntax errors properly -> currently exits directly
-
-void	full_exit(t_shell *shell)
-{
-	rl_clear_history();
-	if (shell->arena)
-		free(shell->arena);
-	if (shell->env)
-		free_env(&shell->env);
-	if (shell->line)
-		free(shell->line);
-	if (shell)
-		free(shell);
-}
-
 t_shell	*init_shell(t_shell *shell, char **envp)
 {
 	t_mem_arena	*arena;
@@ -58,7 +41,7 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 	return (shell);
 }
 
-char	*read_line_input(t_shell *shell, char *prev_line)
+void	read_line_input(t_shell *shell, char *prev_line)
 {
 	char	*tmp;
 	char	*line;
@@ -73,84 +56,50 @@ char	*read_line_input(t_shell *shell, char *prev_line)
 		line = readline("minishell>");
 		if (line && line[0] != '\0')
 			add_history(line);
-		return (line);
+		shell->line = line;
+		if (shell->line == NULL)
+			full_exit(shell, 0);
+		return ;
 	}
 	tmp = get_next_line(fileno(stdin));
-	if (!tmp)
-		return (NULL);
 	line = ft_strtrim(tmp, "\n");
 	free(tmp);
-	return (line);
+	shell->line = line;
+	if (shell->line == NULL)
+		full_exit(shell, 0);
 }
 
-t_env	*find_node(t_env *env)
+void	set_interactive_mode(t_shell *shell)
 {
-	t_env	*last;
-
-	while (env != NULL)
-	{
-		last = env;
-		if (env->name != NULL && ft_strcmp(env->name, "SHLVL") == 0)
-			return (env);
-		env = env->next;
-	}
-	return (last);
-}
-
-int	set_shlvl(t_shell *shell)
-{
-	t_env	*shlvl_node;
-	char	*shlvl;
-	int		shlvl_int;
-	int		tmp;
-
-	shlvl = getenv("SHLVL");
-	shlvl_node = find_node(shell->env);
-	if (shlvl == NULL || is_num(shlvl) == 0)
-		return (add_env_var(shell, shlvl_node, "SHLVL", "1"));
-	if (ft_strcmp(shlvl, "-1") == 0)
-		return (add_env_var(shell, shlvl_node, "SHLVL", "0"));
-	shlvl_int = ft_atol(shlvl);
-	if (shlvl_int == -1)
-		return (add_env_var(shell, shlvl_node, "SHLVL", "1"));
-	if (shlvl_int < 0)
-		return (add_env_var(shell, shlvl_node, "SHLVL", "0"));
+	if (isatty(fileno(stdin)) == true)
+		shell->is_interactive = 1;
 	else
-	{
-		shlvl = ft_itoa(++shlvl_int);
-		tmp = add_env_var(shell, shlvl_node, "SHLVL", shlvl);
-		return (free(shlvl), tmp);
-	}
-	return (0);
+		shell->is_interactive = 0;
+}
+
+void	reset(t_shell *shell)
+{
+	arena_clear(shell->arena);
+	g_sig = 0;
+	shell->cmds = NULL;
+	shell->tokens = NULL;
 }
 
 int	main(int ac, char **av, char **envp)
 {
 	t_shell	*shell;
 
-	(void)ac; (void)av;
+	(void)ac;
+	(void)av;
+	shell = NULL;
 	shell = init_shell(shell, envp);
 	if (shell == NULL)
 		return (EXIT_FAILURE);
-	if (isatty(fileno(stdin)) == true)
-		shell->is_interactive = 1;
-	else
-		shell->is_interactive = 0;
-	setup_signals(shell);
-	rl_event_hook = rl_ev_hook;
-	if (set_shlvl(shell) == 1)
-	{
-		full_exit(shell);
-		exit(1);
-	}
+	set_interactive_mode(shell);
+	signal_and_shlvl(shell);
 	while (true)
 	{
-		shell->line = read_line_input(shell, shell->line);
-		if (shell->line == NULL)    // If EOF (CTRL-D) detected exit
-		{
-			full_exit(shell);
-			exit(0);
-		}
+		read_line_input(shell, shell->line);
 		if (g_sig)
 		{
 			g_sig = 0;
@@ -159,11 +108,8 @@ int	main(int ac, char **av, char **envp)
 		}
 		if (parse(shell) == EXIT_SUCCESS)
 			execution(shell);
-		arena_clear(shell->arena);
-		g_sig = 0;
-		shell->cmds = NULL;
-		shell->tokens = NULL;
+		reset(shell);
 	}
-	full_exit(shell);
+	full_exit(shell, shell->last_exit_status);
 	return (0);
 }

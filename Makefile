@@ -12,7 +12,7 @@ BOLD	:= \033[1m
 
 NAME := minishell
 HEADER := minishell.h
-CFLAGS := -g3 -I.
+CFLAGS := -g3 -I. -Wall -Wextra -Werror
 # -Wall -Wextra -Werror
 
 LIBFT := libs/libft/libft.a
@@ -22,21 +22,27 @@ SRCS =	main.c\
 		src/parsing/parse.c\
 		src/parsing/split.c\
 		src/parsing/token_list.c\
-		src/memory/allocation.c\
 		src/parsing/build_commands.c\
+		src/parsing/build_commands_helper.c\
 		src/environment/convert_envp.c\
 		src/environment/envp.c\
+		src/environment/shlvl1.c\
 		src/execution/exec_helper.c\
 		src/execution/exec_paths.c\
 		src/execution/exec_pipeline.c\
 		src/execution/exec_single_command.c\
+		src/execution/exec_single_command_helper.c\
 		src/execution/execution.c\
 		src/execution/builtins/builtins.c\
 		src/misc/heredoc.c\
+		src/misc/heredoc_expander.c\
+		src/misc/heredoc_helper.c\
 		src/parsing/expansion/parameter/param_helper.c\
 		src/misc/signals.c\
+		src/misc/signal_handler.c\
 		src/parsing/validate_tokens.c\
 		src/memory/arena.c\
+		src/memory/cleanup.c\
 		src/execution/builtins/echo.c\
 		src/execution/builtins/pwd.c\
 		src/execution/builtins/unset.c\
@@ -50,6 +56,8 @@ SRCS =	main.c\
 		src/parsing/expansion/parameter/expansion_size.c\
 		src/parsing/expansion/parameter/expansion_var.c\
 		src/parsing/expansion/word.c\
+		src/parsing/expansion/word2.c\
+		src/parsing/expansion/word3.c\
 		src/parsing/expansion/quote.c\
  		$(GNL_SRCS)\
 
@@ -61,7 +69,7 @@ $(NAME): $(LIBFT) $(OBJS)
 	cc $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
 
 runval:
-	valgrind -s --leak-check=full --show-leak-kinds=all --track-fds=all --trace-children=yes --suppressions=readline.supp ./minishell
+	valgrind -s --track-origins=yes --leak-check=full --show-leak-kinds=all --track-fds=all --trace-children=yes --suppressions=readline.supp ./minishell
 
 tidy: all clean
 

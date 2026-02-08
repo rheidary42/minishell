@@ -17,6 +17,8 @@ int	is_num(char *s)
 	int	i;
 
 	i = 0;
+	if (s == NULL)
+		return (0);
 	if (s != NULL && (s[0] == '+' || s[0] == '-'))
 		i++;
 	if (s[i] == '\0')
