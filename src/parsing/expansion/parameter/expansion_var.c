@@ -25,7 +25,7 @@ size_t	get_var_len(char *value, int *var_start, t_shell *shell)
 	var_end = *var_start;
 	while (value[var_end] && (ft_isalnum(value[var_end])) != 0)
 		var_end++;
-	var_name = (char *)arena_push(shell->arena, var_end - *var_start + 1, 0, shell);
+	var_name = arena_push(shell->arena, var_end - *var_start + 1, 0, shell);
 	ft_strlcpy(var_name, &value[*var_start], var_end - *var_start + 1);
 	head = shell->env;
 	while (head != NULL)

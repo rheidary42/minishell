@@ -29,6 +29,12 @@
 	Layer 4 - List replacement
 	*/
 
+void	split_token_segments_helper(t_token *new, t_token *prev)
+{
+	prev->next = new;
+	new->prev = prev;
+}
+
 t_token	*split_token_segments(t_token *token, t_shell *shell,
 		t_token *first, t_token *prev)
 {
@@ -48,10 +54,7 @@ t_token	*split_token_segments(t_token *token, t_shell *shell,
 		if (!first)
 			first = new;
 		if (prev)
-		{
-			prev->next = new;
-			new->prev = prev;
-		}
+			split_token_segments_helper(new, prev);
 		prev = new;
 		index += len;
 		while (token->expanded[index] != '\0' && is_ifs(token->expanded[index]))
