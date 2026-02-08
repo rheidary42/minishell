@@ -76,7 +76,7 @@ typedef struct s_struct
 	t_u64	pos;
 }	t_mem_arena;
 
-volatile sig_atomic_t	g_sig = 0;
+extern volatile sig_atomic_t	g_sig;
 
 typedef struct s_pos
 {
@@ -349,7 +349,7 @@ void	handle_quote(char *str, int *len);
 //  token_list.c
 void	build_token_list(t_shell *shell, char **arr);
 t_token	*new_node(char *str, t_shell *shell);
-t_toktypetoken_type(char *str);
+t_toktype   token_type(char *str);
 void	append_node(t_shell *shell, t_token *new);
 
 //  validate_tokens.c
