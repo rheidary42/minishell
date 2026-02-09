@@ -20,7 +20,7 @@ void	insert_exit_status(t_pos *pos, t_token *token, t_shell *shell)
 
 	exit_status = ft_itoa(shell->last_exit_status);
 	if (exit_status == NULL)
-		clean_up(shell);
+		full_exit(shell, 1);
 	exit_len = exit_status_len(shell->last_exit_status);
 	i = -1;
 	while (++i < exit_len)

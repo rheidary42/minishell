@@ -35,6 +35,8 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 	}
 	shell->arena = arena;
 	shell->last_exit_status = 0;
+	shell->save_stdin = -1;
+	shell->save_stdout = -1;
 	shell->line = NULL;
 	shell->cmds = NULL;
 	shell->tokens = NULL;
@@ -58,7 +60,7 @@ void	read_line_input(t_shell *shell, char *prev_line)
 			add_history(line);
 		shell->line = line;
 		if (shell->line == NULL)
-			full_exit(shell, 0);
+			full_exit(shell, shell->last_exit_status);
 		return ;
 	}
 	tmp = get_next_line(fileno(stdin));
@@ -66,7 +68,7 @@ void	read_line_input(t_shell *shell, char *prev_line)
 	free(tmp);
 	shell->line = line;
 	if (shell->line == NULL)
-		full_exit(shell, 0);
+		full_exit(shell, shell->last_exit_status);
 }
 
 void	set_interactive_mode(t_shell *shell)
@@ -79,6 +81,22 @@ void	set_interactive_mode(t_shell *shell)
 
 void	reset(t_shell *shell)
 {
+	if (!shell)
+		return ;
+	if (shell->save_stdin != -1)
+	{
+		if (dup2(shell->save_stdin, STDIN_FILENO) == -1)
+			return (full_exit(shell, 1));
+		close(shell->save_stdin);
+		shell->save_stdin = -1;
+	}
+	if (shell->save_stdout != -1)
+	{
+		if (dup2(shell->save_stdout, STDOUT_FILENO) == -1)
+			return (full_exit(shell, 1));
+		close(shell->save_stdout);
+		shell->save_stdout = -1;
+	}
 	arena_clear(shell->arena);
 	g_sig = 0;
 	shell->cmds = NULL;
@@ -99,6 +117,7 @@ int	main(int ac, char **av, char **envp)
 	signal_and_shlvl(shell);
 	while (true)
 	{
+		set_fds(shell);
 		read_line_input(shell, shell->line);
 		if (g_sig)
 		{

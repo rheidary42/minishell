@@ -67,7 +67,7 @@ char	*get_here_doc_name(t_shell *shell)
 
 	idx_str = ft_itoa(heredoc_idx++);
 	if (idx_str == NULL)
-		return (clean_up(shell), NULL);
+		return (full_exit(shell, 1), NULL);
 	tmp_name = str_join3("/tmp/heredoc_", "\0", idx_str, shell);
 	free(idx_str);
 	return (tmp_name);

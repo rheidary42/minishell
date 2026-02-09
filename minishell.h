@@ -151,18 +151,6 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
-typedef struct s_shell
-{
-	t_cmd		*cmds;
-	t_token		*tokens;
-	t_env		*env;
-	char		*line;
-	bool		is_interactive;
-	int			last_exit_status;
-	int			shlvl;
-	t_mem_arena	*arena;
-}	t_shell;
-
 typedef struct s_exec
 {
 	char	**all_paths;
@@ -176,6 +164,21 @@ typedef struct s_exec
 	pid_t	child;
 	pid_t	last_child;
 }	t_exec;
+
+typedef struct s_shell
+{
+	t_cmd		*cmds;
+	t_token		*tokens;
+	t_env		*env;
+	t_exec		*exec;
+	char		*line;
+	bool		is_interactive;
+	int			last_exit_status;
+	int			save_stdin;
+	int			save_stdout;
+	int			shlvl;
+	t_mem_arena	*arena;
+}	t_shell;
 
 /*      		EXECUTION           */
 //  execution.c
@@ -292,11 +295,11 @@ void				*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero,
 t_mem_arena			*arena_create(t_u64 capacity);
 
 //  cleanup.c
+void				set_fds(t_shell *shell);
 void				full_exit(t_shell *shell, int exit_code);
 void				close_fds(t_exec *exec);
 void				free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void				free_env(t_env **env);
-void				clean_up(t_shell *shell);
 
 /*      			    MISC            */
 //  heredoc.c
