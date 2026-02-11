@@ -199,7 +199,7 @@ int					consume_redirs_only(t_redir *redir);
 int					set_exit_status(t_shell *shell);
 char				**set_envp(t_shell *shell,
 						t_cmd *cmd, t_exec *exec, int *builtin_id);
-void				no_final_path(t_shell *shell, t_cmd *cmd, t_exec *exec);
+void				no_final_path(t_shell *shell, t_cmd *cmd, t_exec *exec, char **envp);
 void				read_errno(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void				detect_signals(t_shell *shell, int status);
 

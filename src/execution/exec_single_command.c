@@ -86,7 +86,7 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	else
 		path_lookup(cmd->argv[0], shell, exec);
 	if (exec->final_path == NULL)
-		no_final_path(shell, cmd, exec);
+		no_final_path(shell, cmd, exec, envp);
 	execve(exec->final_path, cmd->argv, envp);
 	exec->errno_save = errno;
 	read_errno(shell, cmd, exec);

@@ -32,8 +32,24 @@ char	**set_envp(t_shell *shell, t_cmd *cmd, t_exec *exec, int *builtin_id)
 	return (envp);
 }
 
-void	no_final_path(t_shell *shell, t_cmd *cmd, t_exec *exec)
+void	no_final_path(t_shell *shell, t_cmd *cmd, t_exec *exec, char **envp)
 {
+	char	*cwd;
+	char	*temp;
+
+	cwd = getcwd(NULL, 0);
+	if (cwd)
+	{
+		temp = str_join3(cwd, "/", cmd->argv[0], shell);
+		if (access(temp, X_OK) == 0)
+		{
+			execve(temp, cmd->argv, envp);
+			exec->errno_save = errno;
+			free(cwd);
+			read_errno(shell, cmd, exec);
+		}
+		free(cwd);
+	}
 	write(STDERR_FILENO, cmd->argv[0], ft_strlen(cmd->argv[0]));
 	write(STDERR_FILENO, ": command not found\n", 21);
 	shell->last_exit_status = 127;
