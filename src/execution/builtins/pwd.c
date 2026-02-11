@@ -12,6 +12,17 @@
 
 #include "minishell.h"
 
+int	change_var(t_env *curr, char *var, int id_len)
+{
+	free(curr->value);
+	curr->value = ft_calloc(ft_strlen(var) - id_len + 1, sizeof(char));
+	if (curr->value == NULL)
+		return (1);
+	curr->has_equal_sign = 0;
+	ft_strlcpy(curr->value, var + id_len + 1, ft_strlen(var) - id_len + 1);
+	return (0);
+}
+
 int	ft_pwd(void)
 {
 	char	*cwd;

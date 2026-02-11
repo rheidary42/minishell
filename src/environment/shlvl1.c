@@ -53,8 +53,17 @@ int	set_shlvl(t_shell *shell)
 	return (0);
 }
 
+void	set_interactive_mode(t_shell *shell)
+{
+	if (isatty(fileno(stdin)) == true)
+		shell->is_interactive = 1;
+	else
+		shell->is_interactive = 0;
+}
+
 void	signal_and_shlvl(t_shell *shell)
 {
+	set_interactive_mode(shell);
 	setup_signals(shell);
 	rl_event_hook = rl_ev_hook;
 	if (set_shlvl(shell) == 1)

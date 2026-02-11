@@ -12,27 +12,12 @@
 
 #include "minishell.h"
 
-void	set_fds(t_shell *shell)
-{
-	if (!shell)
-		return;
-	if (shell->save_stdin != -1)
-		close(shell->save_stdin);
-	if (shell->save_stdout != -1)
-		close(shell->save_stdout);
-	shell->save_stdin = dup(STDIN_FILENO);
-	shell->save_stdout = dup(STDOUT_FILENO);
-	if (shell->save_stdin == -1 || shell->save_stdout == -1)
-		full_exit(shell, 1);
-}
-
 void	close_shell_fds(t_shell *shell)
 {
 	if (shell->save_stdin != -1)
 		close(shell->save_stdin);
 	if (shell->save_stdout != -1)
 		close(shell->save_stdout);
-
 	shell->save_stdin = -1;
 	shell->save_stdout = -1;
 }
@@ -45,7 +30,6 @@ void	close_exec_fds(t_exec *exec)
 		close(exec->pipe_fds[1]);
 	if (exec->file_fd != -1)
 		close(exec->file_fd);
-
 	exec->pipe_fds[0] = -1;
 	exec->pipe_fds[1] = -1;
 	exec->file_fd = -1;

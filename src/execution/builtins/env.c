@@ -19,7 +19,8 @@ int	ft_env(t_env *env)
 	curr = env;
 	while (curr != NULL)
 	{
-		if (curr->exported == true && curr->value && curr->value[0] != '\0')
+		if (curr->exported == true && curr->value
+			&& curr->has_equal_sign == 0)
 		{
 			write(STDOUT_FILENO, curr->name, ft_strlen(curr->name));
 			write(STDOUT_FILENO, "=", 1);

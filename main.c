@@ -37,9 +37,6 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 	shell->last_exit_status = 0;
 	shell->save_stdin = -1;
 	shell->save_stdout = -1;
-	shell->line = NULL;
-	shell->cmds = NULL;
-	shell->tokens = NULL;
 	return (shell);
 }
 
@@ -71,12 +68,18 @@ void	read_line_input(t_shell *shell, char *prev_line)
 		full_exit(shell, shell->last_exit_status);
 }
 
-void	set_interactive_mode(t_shell *shell)
+void	save_fds(t_shell *shell)
 {
-	if (isatty(fileno(stdin)) == true)
-		shell->is_interactive = 1;
-	else
-		shell->is_interactive = 0;
+	if (!shell)
+		return ;
+	if (shell->save_stdin != -1)
+		close(shell->save_stdin);
+	if (shell->save_stdout != -1)
+		close(shell->save_stdout);
+	shell->save_stdin = dup(STDIN_FILENO);
+	shell->save_stdout = dup(STDOUT_FILENO);
+	if (shell->save_stdin == -1 || shell->save_stdout == -1)
+		full_exit(shell, 1);
 }
 
 void	reset(t_shell *shell)
@@ -113,11 +116,10 @@ int	main(int ac, char **av, char **envp)
 	shell = init_shell(shell, envp);
 	if (shell == NULL)
 		return (EXIT_FAILURE);
-	set_interactive_mode(shell);
 	signal_and_shlvl(shell);
 	while (true)
 	{
-		set_fds(shell);
+		save_fds(shell);
 		read_line_input(shell, shell->line);
 		if (g_sig)
 		{

@@ -32,6 +32,7 @@ int	copy_var(t_env *env, char *str)
 	{
 		env->name = ft_strdup(str);
 		env->value = ft_strdup("");
+		env->has_equal_sign = 1;
 		env->exported = true;
 		if (!env->name || !env->value)
 			return (0);

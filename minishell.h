@@ -139,6 +139,7 @@ typedef struct s_env
 	char			*name;
 	char			*value;
 	bool			exported;
+	int				has_equal_sign;
 	struct s_env	*next;
 }	t_env;
 
@@ -260,6 +261,7 @@ void				just_export(t_env *env);
 int					validate_id(char *s);
 
 //  pwd.c
+int					change_var(t_env *curr, char *var, int id_len);
 int					ft_pwd(void);
 
 //  unset.c
@@ -284,6 +286,7 @@ size_t				strlen_delim(char *str, char delim);
 void				signal_and_shlvl(t_shell *shell);
 int					set_shlvl(t_shell *shell);
 t_env				*find_node(t_env *env);
+void				set_interactive_mode(t_shell *shell);
 
 /*      			    MEMORY          */
 //  arena.c
@@ -295,9 +298,9 @@ void				*arena_push(t_mem_arena *arena, t_u64 size, t_b32 non_zero,
 t_mem_arena			*arena_create(t_u64 capacity);
 
 //  cleanup.c
-void				set_fds(t_shell *shell);
+void				close_shell_fds(t_shell *shell);
+void				close_exec_fds(t_exec *exec);
 void				full_exit(t_shell *shell, int exit_code);
-void				close_fds(t_exec *exec);
 void				free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);
 void				free_env(t_env **env);
 

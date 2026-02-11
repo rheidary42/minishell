@@ -38,7 +38,7 @@ void	just_export(t_env *env)
 		{
 			write(STDOUT_FILENO, "declare -x ", 12);
 			write(STDOUT_FILENO, env->name, ft_strlen(env->name));
-			if (env->value != NULL)
+			if (env->value != NULL && env->has_equal_sign != 1)
 			{
 				write(STDOUT_FILENO, "=\"", 2);
 				write(STDOUT_FILENO, env->value, ft_strlen(env->value));
@@ -78,7 +78,7 @@ int	process_var(t_env *env, char *var)
 		id_len++;
 	while (curr != NULL)
 	{
-		if (ft_strcmp(curr->name, var) == 0)
+		if (ft_strncmp(curr->name, var, id_len) == 0)
 			break ;
 		curr = curr->next;
 	}
@@ -86,13 +86,7 @@ int	process_var(t_env *env, char *var)
 		return (new_var(env, var));
 	curr->exported = true;
 	if (var[id_len] != '\0')
-	{
-		free(curr->value);
-		curr->value = ft_calloc(ft_strlen(var) - id_len + 1, sizeof(char));
-		if (curr->value == NULL)
-			return (1);
-		ft_strlcpy(curr->value, var + id_len + 1, ft_strlen(var) - id_len + 1);
-	}
+		return (change_var(curr, var, id_len));
 	return (0);
 }
 
