@@ -48,7 +48,7 @@ void	wait_for_children(t_shell *shell, t_exec *exec)
 		if (temp_pid == exec->last_child && WIFEXITED(status) != 0)
 			shell->last_exit_status = WEXITSTATUS(status);
 	}
-	if (exec->sig_flag == 1)
+	if (exec->sig_flag == 1 && temp_pid == exec->last_child)
 		sig_err_msg(shell, sig_num);
 }
 
