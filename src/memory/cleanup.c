@@ -22,7 +22,7 @@ void	close_shell_fds(t_shell *shell)
 	shell->save_stdout = -1;
 }
 
-void	close_exec_fds(t_exec *exec)
+void close_exec_fds(t_exec *exec)
 {
 	if (exec->pipe_fds[0] != -1)
 		close(exec->pipe_fds[0]);
@@ -67,6 +67,7 @@ void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec)
 		shell->arena = NULL;
 	}
 	free_env(&shell->env);
+	close_shell_fds(shell);
 	if (shell)
 	{
 		free(shell);

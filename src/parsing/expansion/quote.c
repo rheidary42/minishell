@@ -30,11 +30,8 @@ bool	needs_removal(t_token *token)
 	if (token->type != TOKEN_WORD)
 		return (false);
 	if (token->is_expanded == true)
-		str = token->expanded;
-	else
-		str = token->value;
-	if (just_quotes(str) == true)
 		return (false);
+	str = token->value;
 	i = 0;
 	while (str[i] != '\0')
 	{

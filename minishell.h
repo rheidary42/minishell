@@ -154,7 +154,7 @@ typedef struct s_cmd
 
 typedef struct s_exec
 {
-	char	**all_paths;
+	char	**all_paths;	
 	char	*paths_from_env;
 	char	*final_path;
 	int		pipe_fds[2];

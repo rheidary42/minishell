@@ -43,6 +43,7 @@ void	no_final_path(t_shell *shell, t_cmd *cmd, t_exec *exec, char **envp)
 		temp = str_join3(cwd, "/", cmd->argv[0], shell);
 		if (access(temp, X_OK) == 0)
 		{
+			close_shell_fds(shell);
 			execve(temp, cmd->argv, envp);
 			exec->errno_save = errno;
 			free(cwd);

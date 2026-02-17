@@ -36,8 +36,11 @@ int	parse(t_shell *shell)
 	if (tokenize(shell) == NULL)
 		return (EXIT_FAILURE);
 	parameter(shell);
+	printf("Tokens after parsing0: %s\n", shell->tokens->next->value);
 	word(shell);
+	printf("Tokens after parsing1: %s\n", shell->tokens->next->value);
 	quote_removal(shell);
+	printf("Tokens after parsing2: %s\n", shell->tokens->next->value);
 	build_commands(shell);
 	return (EXIT_SUCCESS);
 }
