@@ -6,11 +6,21 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/26 17:32:37 by rheidary          #+#    #+#             */
-/*   Updated: 2026/02/02 20:06:30 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/17 18:18:31 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+bool	just_quotes(char *str)
+{
+	if (str[0] == '\0' || str[1] == '\0')
+		return (true);
+	if ((str[0] == '\'' || str[0] == '"')
+		&& (str[1] == '\'' || str[1] == '"'))
+		return (true);
+	return (false);
+}
 
 bool	needs_removal(t_token *token)
 {
@@ -23,6 +33,8 @@ bool	needs_removal(t_token *token)
 		str = token->expanded;
 	else
 		str = token->value;
+	if (just_quotes(str) == true)
+		return (false);
 	i = 0;
 	while (str[i] != '\0')
 	{
