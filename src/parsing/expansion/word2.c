@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 04:16:50 by boenkhja          #+#    #+#             */
-/*   Updated: 2026/02/18 01:11:47 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/18 03:40:35 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,26 +37,28 @@ int	calc_new_token_size(t_token *token, int *index)
 {
 	int		i;
 	int		pos;
+	int		leading_space_offset;
 	bool	state;
 
 	i = 0;
 	pos = *index;
+	leading_space_offset = 0;
 	state = token->ws_mask[pos];
-	while (token->expanded[pos + i] != '\0' && token->ws_mask[pos + i] == state)
-	{
+	while (token->expanded[pos + i] != '\0' && token->ws_mask[pos + i] == state
+		&& is_ifs(token->expanded[pos + i])
+		&& !(is_ifs(token->expanded[pos + i + 1])) && leading_space_offset++)
 		i++;
-	}
+	while (token->expanded[pos + i] != '\0' && token->ws_mask[pos + i] == state)
+		i++;
 	if ((pos + i > 0 && token->expanded[pos + i] != '\0')
 		&& is_ifs(token->expanded[pos + i]) == false)
 	{
 		while (token->expanded[pos + i] != '\0'
 			&& is_ifs(token->expanded[pos + i]) == false)
-		{
 			i++;
-		}
 	}
 	*index += i;
-	return (i);
+	return (i - leading_space_offset);
 }
 
 t_token	*make_base_token(t_token *src, int start, int len, t_shell *shell)
