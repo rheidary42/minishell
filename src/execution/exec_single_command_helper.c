@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_single_command_helper.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 03:02:04 by boenkhja          #+#    #+#             */
-/*   Updated: 2026/02/08 03:02:05 by boenkhja         ###   ########.fr       */
+/*   Updated: 2026/02/18 02:03:36 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	detect_signals(t_shell *shell, int status)
 	}
 	if (sig_num == SIGQUIT)
 	{
-		write(1, "Quit (core dumped)\n", 20);
+		write(1, "Quit\n", 5);
 	}
 	shell->last_exit_status = 128 + sig_num;
 }

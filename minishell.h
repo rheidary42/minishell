@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 06:10:15 by boenkhja          #+#    #+#             */
-/*   Updated: 2026/02/08 16:18:34 by boenkhja         ###   ########.fr       */
+/*   Updated: 2026/02/18 02:47:11 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -378,7 +378,7 @@ int					is_redir2(t_token *tok);
 /*      			    EXPANSION           */
 //  quote.c
 bool				needs_removal(t_token *token);
-char				*remove_quotes(char *value, t_shell *shell);
+char				*remove_quotes(char *value, t_token *token, t_shell *shell);
 void				quote_removal(t_shell *shell);
 
 // word.c
@@ -391,7 +391,7 @@ void				word(t_shell *shell);
 // word2.c
 bool				is_ifs(char c);
 bool				needs_splitting(t_token *curr);
-int					calc_token_size(t_token *token, int *index);
+int					calc_new_token_size(t_token *token, int *index);
 t_token				*make_base_token(t_token *src,
 						int start, int len, t_shell *shell);
 void				splice_token(t_token *old, t_token *first, t_token *last,

@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 12:23:09 by rheidary          #+#    #+#             */
-/*   Updated: 2026/02/05 14:25:21 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/18 01:03:06 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,8 @@ int	parse(t_shell *shell)
 	if (tokenize(shell) == NULL)
 		return (EXIT_FAILURE);
 	parameter(shell);
-	printf("Tokens after parsing0: %s\n", shell->tokens->next->value);
 	word(shell);
-	printf("Tokens after parsing1: %s\n", shell->tokens->next->value);
 	quote_removal(shell);
-	printf("Tokens after parsing2: %s\n", shell->tokens->next->value);
 	build_commands(shell);
 	return (EXIT_SUCCESS);
 }

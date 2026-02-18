@@ -6,7 +6,7 @@
 /*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/26 17:32:37 by rheidary          #+#    #+#             */
-/*   Updated: 2026/02/17 18:18:31 by rheidary         ###   ########.fr       */
+/*   Updated: 2026/02/18 02:51:04 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,18 @@ bool	just_quotes(char *str)
 	return (false);
 }
 
+bool	no_mask(t_token *token, size_t i)
+{
+	return (!(token->ws_mask == NULL)
+		|| !((token->is_expanded && token->ws_mask[i])));
+}
+
 bool	needs_removal(t_token *token)
 {
 	size_t	i;
 	char	*str;
 
 	if (token->type != TOKEN_WORD)
-		return (false);
-	if (token->is_expanded == true)
 		return (false);
 	str = token->value;
 	i = 0;
@@ -42,7 +46,7 @@ bool	needs_removal(t_token *token)
 	return (false);
 }
 
-char	*remove_quotes(char *value, t_shell *shell)
+char	*remove_quotes(char *value, t_token *curr, t_shell *shell)
 {
 	size_t	i;
 	size_t	j;
@@ -56,9 +60,11 @@ char	*remove_quotes(char *value, t_shell *shell)
 	while (value[i] != '\0')
 	{
 		update_quote_state(value[i], &quote_state);
-		if (quote_state == DOUBLE_QUOTE && value[i] == '\'')
+		if (quote_state == DOUBLE_QUOTE && value[i] == '\''
+			&& no_mask(curr, i))
 			dest[j++] = value[i];
-		if (quote_state == SINGLE_QUOTE && value[i] == '\"')
+		if (quote_state == SINGLE_QUOTE && value[i] == '\"'
+			&& no_mask(curr, i))
 			dest[j++] = value[i];
 		if (value[i] != '\"' && value[i] != '\'')
 			dest[j++] = value[i];
@@ -80,12 +86,12 @@ void	quote_removal(t_shell *shell)
 		{
 			if (current->is_expanded == true)
 			{
-				new_str = remove_quotes(current->expanded, shell);
+				new_str = remove_quotes(current->expanded, current, shell);
 				current->expanded = new_str;
 			}
 			else
 			{
-				new_str = remove_quotes(current->value, shell);
+				new_str = remove_quotes(current->value, current, shell);
 				current->value = new_str;
 			}
 			current->was_quoted = true;

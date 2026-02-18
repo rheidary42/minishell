@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   word3.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 04:16:53 by boenkhja          #+#    #+#             */
-/*   Updated: 2026/02/08 04:16:54 by boenkhja         ###   ########.fr       */
+/*   Updated: 2026/02/18 02:20:30 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	generate_base_tokens(t_token *curr, t_shell *shell)
 	index = 0;
 	while (curr->expanded[index] != '\0')
 	{
-		len = calc_token_size(curr, &index);
+		len = calc_new_token_size(curr, &index);
 		new = make_base_token(curr, index - len, len, shell);
 		if (!first)
 			first = new;
@@ -49,11 +49,12 @@ t_token	*make_split_token(t_token *src, int start, int len, t_shell *shell)
 	new->is_expanded = true;
 	new->value = src->value;
 	new->expanded = (char *)arena_push(shell->arena, len + 1, 0, shell);
-	new->ws_mask = NULL;
+	new->ws_mask = (bool *)arena_push(shell->arena, len, 0, shell);
 	i = 0;
 	while (i < len)
 	{
 		new->expanded[i] = src->expanded[start + i];
+		new->ws_mask[i] = src->ws_mask[start + i];
 		i++;
 	}
 	new->expanded[len] = '\0';

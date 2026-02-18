@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 03:43:59 by boenkhja          #+#    #+#             */
-/*   Updated: 2026/02/08 03:44:00 by boenkhja         ###   ########.fr       */
+/*   Updated: 2026/02/18 02:03:28 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	sig_err_msg(t_shell *shell, int sig_num)
 	}
 	if (sig_num == SIGQUIT)
 	{
-		write(1, "Quit (core dumped)\n", 20);
+		write(1, "Quit\n", 5);
 	}
 	shell->last_exit_status = 128 + sig_num;
 }

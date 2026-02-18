@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   word2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boenkhja <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rheidary <rheidary@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 04:16:50 by boenkhja          #+#    #+#             */
-/*   Updated: 2026/02/08 04:16:51 by boenkhja         ###   ########.fr       */
+/*   Updated: 2026/02/18 01:11:47 by rheidary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ bool	needs_splitting(t_token *curr)
 	return (false);
 }
 
-int	calc_token_size(t_token *token, int *index)
+int	calc_new_token_size(t_token *token, int *index)
 {
 	int		i;
 	int		pos;
