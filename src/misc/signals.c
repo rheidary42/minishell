@@ -22,7 +22,7 @@ void	sig_err_msg(t_shell *shell, int sig_num)
 	}
 	if (sig_num == SIGQUIT)
 	{
-		write(1, "Quit\n", 5);
+		write(1, "Quit (core dumped)\n", 20);
 	}
 	shell->last_exit_status = 128 + sig_num;
 }

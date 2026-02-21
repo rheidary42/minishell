@@ -67,14 +67,13 @@ int	apply_redir(t_shell *shell, t_redir *redirection, t_exec *exec)
 void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
 	char	**envp;
-	int		builtin_id;
 
 	if (apply_redir(shell, cmd->redir, exec) == 1)
 		free_and_close(shell, cmd, exec);
-	envp = set_envp(shell, cmd, exec, &builtin_id);
-	if (builtin_id >= 0)
+	envp = set_envp(shell, cmd, exec, &exec->builtin_id);
+	if (exec->builtin_id >= 0)
 	{
-		exec_builtin(shell, cmd, shell->env, builtin_id);
+		exec_builtin(shell, cmd, shell->env, exec->builtin_id);
 		free_and_close(shell, cmd, exec);
 	}
 	if (is_direct_path(cmd->argv[0]) == true)

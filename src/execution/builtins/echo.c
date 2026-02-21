@@ -32,13 +32,13 @@ bool	is_flag(char *str)
 int	ft_echo(t_cmd *cmd)
 {
 	int	i;
-	int	newline;
+	int	new_line;
 
-	newline = 1;
+	new_line = 1;
 	i = 1;
 	while (cmd->argv[i] && is_flag(cmd->argv[i]) == 1)
 	{
-		newline = 0;
+		new_line = 0;
 		i++;
 	}
 	while (cmd->argv[i])
@@ -48,7 +48,7 @@ int	ft_echo(t_cmd *cmd)
 			write(STDOUT_FILENO, " ", 1);
 		i++;
 	}
-	if (newline == 1)
+	if (new_line == 1)
 		write(STDOUT_FILENO, "\n", 1);
 	return (0);
 }

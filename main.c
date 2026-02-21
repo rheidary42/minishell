@@ -34,7 +34,6 @@ t_shell	*init_shell(t_shell *shell, char **envp)
 		return (NULL);
 	}
 	shell->arena = arena;
-	shell->last_exit_status = 0;
 	shell->save_stdin = -1;
 	shell->save_stdout = -1;
 	return (shell);

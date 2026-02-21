@@ -47,7 +47,9 @@
 
 /* Termcap / Termios (tgetent, tputs, etc) */
 # include <termios.h>
+# include <curses.h>
 # include <termcap.h>
+# include <term.h>
 
 /* Readline */
 # include <readline/readline.h>
@@ -162,6 +164,7 @@ typedef struct s_exec
 	int		file_fd;
 	int		sig_flag;
 	int		errno_save;
+	int		builtin_id;
 	pid_t	child;
 	pid_t	last_child;
 }	t_exec;

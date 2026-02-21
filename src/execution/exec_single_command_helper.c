@@ -78,7 +78,7 @@ void	detect_signals(t_shell *shell, int status)
 	}
 	if (sig_num == SIGQUIT)
 	{
-		write(1, "Quit\n", 5);
+		write(1, "Quit (core dumped)\n", 20);
 	}
 	shell->last_exit_status = 128 + sig_num;
 }

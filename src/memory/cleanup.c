@@ -22,7 +22,7 @@ void	close_shell_fds(t_shell *shell)
 	shell->save_stdout = -1;
 }
 
-void close_exec_fds(t_exec *exec)
+void	close_exec_fds(t_exec *exec)
 {
 	if (exec->pipe_fds[0] != -1)
 		close(exec->pipe_fds[0]);
