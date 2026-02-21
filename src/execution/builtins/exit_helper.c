@@ -64,6 +64,7 @@ long	ft_atol(char *s)
 void	cleanup_and_exit(t_shell *shell, int exit_code)
 {
 	write(STDERR_FILENO, "exit\n", 5);
+	close_shell_fds(shell);
 	free_env(&shell->env);
 	free(shell->arena);
 	free(shell);
@@ -76,6 +77,7 @@ void	handle_exit_error(t_shell *shell, char *arg, char *s)
 	write(STDERR_FILENO, "exit: ", 6);
 	write(STDERR_FILENO, arg, ft_strlen(arg));
 	write(STDERR_FILENO, ": numeric argument required\n", 28);
+	close_shell_fds(shell);
 	free_env(&shell->env);
 	free(shell->arena);
 	free(shell);
