@@ -15,7 +15,7 @@
 void	fork_failure(t_shell *shell, t_cmd *cmd, t_exec *exec)
 {
 	perror("fork failed\n");
-	free_and_close(shell, cmd, exec);
+	free_and_close(shell, cmd, exec, false);
 }
 
 void	redirection(t_exec *exec)
@@ -60,7 +60,7 @@ void	exec_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	{
 		if (dup2(exec->prev_fd, STDIN_FILENO) == -1)
 		{
-			free_and_close(shell, cmd, exec);
+			free_and_close(shell, cmd, exec, false);
 			perror("dup2");
 			exit(1);
 		}
@@ -70,7 +70,7 @@ void	exec_cmd(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	{
 		if (dup2(exec->pipe_fds[1], STDOUT_FILENO) == -1)
 		{
-			free_and_close(shell, cmd, exec);
+			free_and_close(shell, cmd, exec, false);
 			perror("dup2");
 			exit(1);
 		}

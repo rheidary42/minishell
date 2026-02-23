@@ -54,11 +54,13 @@ void	full_exit(t_shell *shell, int exit_code)
 	exit(exit_code);
 }
 
-void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec)
+void	free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec, bool in_parent)
 {
 	int	ret;
 
 	(void)cmd;
+	if (in_parent == true)
+		return ;
 	ret = shell->last_exit_status;
 	close_exec_fds(exec);
 	if (shell->arena)

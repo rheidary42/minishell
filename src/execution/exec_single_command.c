@@ -69,12 +69,12 @@ void	exec_in_child_helper(t_shell *shell, t_cmd *cmd, t_exec *exec)
 	char	**envp;
 
 	if (apply_redir(shell, cmd->redir, exec) == 1)
-		free_and_close(shell, cmd, exec);
+		free_and_close(shell, cmd, exec, false);
 	envp = set_envp(shell, cmd, exec, &exec->builtin_id);
 	if (exec->builtin_id >= 0)
 	{
 		exec_builtin(shell, cmd, shell->env, exec->builtin_id);
-		free_and_close(shell, cmd, exec);
+		free_and_close(shell, cmd, exec, false);
 	}
 	if (is_direct_path(cmd->argv[0]) == true)
 	{
@@ -139,7 +139,7 @@ int	exec_single_cmd(t_shell *shell, t_exec *exec)
 	if (builtin_id >= 0)
 	{
 		if (apply_redir(shell, cmd->redir, exec) == 1)
-			free_and_close(shell, shell->cmds, exec);
+			return (free_and_close(shell, shell->cmds, exec, true), 1);
 		shell->last_exit_status = exec_builtin(shell, cmd,
 				shell->env, builtin_id);
 		return (shell->last_exit_status);

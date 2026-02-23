@@ -305,7 +305,8 @@ t_mem_arena			*arena_create(t_u64 capacity);
 void				close_shell_fds(t_shell *shell);
 void				close_exec_fds(t_exec *exec);
 void				full_exit(t_shell *shell, int exit_code);
-void				free_and_close(t_shell *shell, t_cmd *cmd, t_exec *exec);
+void				free_and_close(t_shell *shell, t_cmd *cmd,
+						t_exec *exec, bool in_parent);
 void				free_env(t_env **env);
 
 /*      			    MISC            */
