@@ -24,7 +24,7 @@ t_token	*tokenize(t_shell *shell)
 	build_token_list(shell, arr);
 	if (!validate_tokens(shell->tokens))
 	{
-		write(STDERR_FILENO, "minishell: syntax error\n", 25);
+		write(STDERR_FILENO, "minishell: syntax error HERE\n", 25);
 		shell->last_exit_status = 2;
 		return (NULL);
 	}
@@ -39,5 +39,10 @@ int	parse(t_shell *shell)
 	word(shell);
 	quote_removal(shell);
 	build_commands(shell);
+	if (shell && shell->line)
+	{
+		free(shell->line);
+		shell->line = NULL;
+	}
 	return (EXIT_SUCCESS);
 }
