@@ -116,7 +116,7 @@ void	word(t_shell *shell)
 	{
 		next = curr->next;
 		if (curr->type == TOKEN_WORD && curr->is_expanded == true
-			&& curr->ws_mask != NULL && is_whitespace_token(curr))
+			&& curr->ws_mask != NULL)
 		{
 			split_value(curr, shell);
 		}
