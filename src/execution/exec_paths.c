@@ -81,7 +81,7 @@ char	**split_paths(char *paths_from_env, t_shell *shell)
 		end++;
 	}
 	if (end - start > 0)
-		all_paths[path_count] = split_paths_helper(shell,
+		all_paths[path_count++] = split_paths_helper(shell,
 				paths_from_env, &end, &start);
 	all_paths[path_count] = NULL;
 	return (all_paths);
